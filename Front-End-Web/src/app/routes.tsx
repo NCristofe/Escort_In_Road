@@ -16,6 +16,9 @@ import { CargoRegistration } from "./pages/CargoRegistration";
 import { BulkUpload } from "./pages/BulkUpload";
 import { OperationalMap } from "./pages/OperationalMap";
 import { DocumentAdmin } from "./pages/DocumentAdmin";
+import { EsgDashboard } from "./pages/EsgDashboard";
+import { FreightSavings } from "./pages/FreightSavings";
+import { FleetPerformance } from "./pages/FleetPerformance";
 import { UserManagement } from "./pages/UserManagement";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { Login } from "./pages/Login";
@@ -45,6 +48,9 @@ export const router = createBrowserRouter([
       { path: "cadastro-cargas", element: <ProtectedRoute><CargoRegistration /></ProtectedRoute> },
       { path: "gestao-lotes", element: <ProtectedRoute><BulkUpload /></ProtectedRoute> },
       { path: "mapa-operacional", element: <ProtectedRoute><OperationalMap /></ProtectedRoute> },
+      { path: "painel-esg", element: <ProtectedRoute><EsgDashboard /></ProtectedRoute> },
+      { path: "economia-frete", element: <ProtectedRoute><FreightSavings /></ProtectedRoute> },
+      { path: "performance", element: <ProtectedRoute><FleetPerformance /></ProtectedRoute> },
       { path: "admin-documentos", element: <ProtectedRoute><DocumentAdmin /></ProtectedRoute> },
       { path: "admin-usuarios", element: <ProtectedRoute><UserManagement /></ProtectedRoute> },
       { path: "trabalhe-conosco", element: <Careers /> },
