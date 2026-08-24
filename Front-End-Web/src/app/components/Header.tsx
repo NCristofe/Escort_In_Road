@@ -27,6 +27,8 @@ export function Header() {
     { path: "/performance", label: "Performance" },
     { path: "/admin-documentos", label: "Documentos" },
     { path: "/admin-usuarios", label: "Usuários" },
+    { path: "/planos", label: "Planos e faturas" },
+    { path: "/chaves-api", label: "Chaves de API" },
   ];
 
   const mobileNavItems = [
