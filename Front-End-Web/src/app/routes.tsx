@@ -17,6 +17,9 @@ import { BulkUpload } from "./pages/BulkUpload";
 import { OperationalMap } from "./pages/OperationalMap";
 import { DocumentAdmin } from "./pages/DocumentAdmin";
 import { EsgDashboard } from "./pages/EsgDashboard";
+import { SubscriptionCheckout } from "./pages/SubscriptionCheckout";
+import { PlanManagement } from "./pages/PlanManagement";
+import { ApiKeys } from "./pages/ApiKeys";
 import { FreightSavings } from "./pages/FreightSavings";
 import { FleetPerformance } from "./pages/FleetPerformance";
 import { UserManagement } from "./pages/UserManagement";
@@ -51,6 +54,9 @@ export const router = createBrowserRouter([
       { path: "painel-esg", element: <ProtectedRoute><EsgDashboard /></ProtectedRoute> },
       { path: "economia-frete", element: <ProtectedRoute><FreightSavings /></ProtectedRoute> },
       { path: "performance", element: <ProtectedRoute><FleetPerformance /></ProtectedRoute> },
+      { path: "assinatura", element: <ProtectedRoute><SubscriptionCheckout /></ProtectedRoute> },
+      { path: "planos", element: <ProtectedRoute><PlanManagement /></ProtectedRoute> },
+      { path: "chaves-api", element: <ProtectedRoute><ApiKeys /></ProtectedRoute> },
       { path: "admin-documentos", element: <ProtectedRoute><DocumentAdmin /></ProtectedRoute> },
       { path: "admin-usuarios", element: <ProtectedRoute><UserManagement /></ProtectedRoute> },
       { path: "trabalhe-conosco", element: <Careers /> },
