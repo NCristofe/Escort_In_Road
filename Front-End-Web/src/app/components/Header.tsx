@@ -14,7 +14,6 @@ export function Header() {
     { path: "/servicos", label: "Serviços" },
     { path: "/cobertura", label: "Cobertura" },
     { path: "/rastreamento", label: "Rastreamento" },
-    { path: "/gestao-planos", label: "Plano" },
     { path: "/contato", label: "Contato" },
   ];
 
@@ -28,13 +27,13 @@ export function Header() {
     { path: "/performance", label: "Performance" },
     { path: "/admin-documentos", label: "Documentos" },
     { path: "/admin-usuarios", label: "Usuários" },
+    { path: "/planos", label: "Planos e faturas" },
+    { path: "/chaves-api", label: "Chaves de API" },
   ];
 
   const mobileNavItems = [
     ...navItems,
     ...panelItems,
-    { path: "/checkout-assinatura", label: "Assinatura Premium" },
-    { path: "/chaves-api", label: "Chaves de API" },
     { path: "/tecnologia", label: "Tecnologia" },
     { path: "/clientes", label: "Clientes" },
     { path: "/faq", label: "FAQ" },
