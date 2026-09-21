@@ -1,10 +1,12 @@
 import { Link, useLocation } from "react-router";
-import { Truck, Menu, X, Phone } from "lucide-react";
-import { useState } from "react";
+import { Truck, Menu, X, Phone, ChevronDown } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 export function Header() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [panelsOpen, setPanelsOpen] = useState(false);
+  const panelsRef = useRef<HTMLDivElement | null>(null);
 
   const navItems = [
     { path: "/", label: "Início" },
@@ -12,17 +14,25 @@ export function Header() {
     { path: "/servicos", label: "Serviços" },
     { path: "/cobertura", label: "Cobertura" },
     { path: "/rastreamento", label: "Rastreamento" },
-    { path: "/cadastro-cargas", label: "Cargas" },
-    { path: "/gestao-lotes", label: "Lotes" },
-    { path: "/mapa-operacional", label: "Mapa" },
-    { path: "/admin-documentos", label: "Docs" },
-    { path: "/admin-usuarios", label: "Users" },
     { path: "/gestao-planos", label: "Plano" },
     { path: "/contato", label: "Contato" },
   ];
 
+  /** Painéis internos: agrupados para o menu não estourar a largura do header. */
+  const panelItems = [
+    { path: "/cadastro-cargas", label: "Cadastro de cargas" },
+    { path: "/gestao-lotes", label: "Gestão de lotes" },
+    { path: "/mapa-operacional", label: "Mapa operacional" },
+    { path: "/painel-esg", label: "Painel ESG" },
+    { path: "/economia-frete", label: "Economia de frete" },
+    { path: "/performance", label: "Performance" },
+    { path: "/admin-documentos", label: "Documentos" },
+    { path: "/admin-usuarios", label: "Usuários" },
+  ];
+
   const mobileNavItems = [
     ...navItems,
+    ...panelItems,
     { path: "/checkout-assinatura", label: "Assinatura Premium" },
     { path: "/chaves-api", label: "Chaves de API" },
     { path: "/tecnologia", label: "Tecnologia" },
@@ -32,6 +42,29 @@ export function Header() {
     { path: "/unidades", label: "Unidades" },
     { path: "/trabalhe-conosco", label: "Trabalhe Conosco" },
   ];
+
+  useEffect(() => {
+    setPanelsOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!panelsOpen) return;
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!panelsRef.current?.contains(event.target as Node)) setPanelsOpen(false);
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPanelsOpen(false);
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [panelsOpen]);
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
@@ -87,6 +120,45 @@ export function Header() {
                   {item.label}
                 </Link>
               ))}
+
+              <div className="relative" ref={panelsRef}>
+                <button
+                  type="button"
+                  onClick={() => setPanelsOpen((open) => !open)}
+                  aria-expanded={panelsOpen}
+                  aria-haspopup="true"
+                  className={`flex items-center gap-1 font-semibold text-xs xl:text-sm 2xl:text-base transition-colors ${
+                    panelItems.some((item) => isActive(item.path))
+                      ? "text-orange-600"
+                      : "text-gray-700 hover:text-orange-600"
+                  }`}
+                >
+                  Painéis
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${panelsOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+
+                {panelsOpen && (
+                  <div className="absolute right-0 mt-3 w-60 rounded-xl border border-gray-100 bg-white py-2 shadow-xl">
+                    {panelItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setPanelsOpen(false)}
+                        className={`block px-4 py-2.5 text-sm font-semibold transition-colors ${
+                          isActive(item.path)
+                            ? "text-orange-600 bg-orange-50"
+                            : "text-gray-700 hover:text-orange-600 hover:bg-gray-50"
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <Link
                 to="/cotacao"
                 className="bg-orange-600 text-white px-3 xl:px-4 2xl:px-6 py-2.5 rounded-lg font-semibold text-xs xl:text-sm 2xl:text-base hover:bg-orange-700 transition-colors"

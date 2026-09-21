@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { Truck, Clock, Shield, MapPin, ArrowRight, CheckCircle, Package, Star, TrendingUp, Users } from "lucide-react";
-import { ImageWithFallback } from "../components/imagefallback/ImageWithFallback";
+import { SafeImage } from "../components/media/SafeImage";
 
 export function Home() {
   const features = [
@@ -130,8 +130,8 @@ export function Home() {
             <div className="relative hidden lg:block">
               <div className="absolute -top-4 -right-4 w-72 h-72 bg-orange-600 rounded-full opacity-20 blur-3xl"></div>
               <div className="relative bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                <ImageWithFallback
-                  src="https://images.unsplash.com/photo-1760662052295-f84068499a03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZWxpdmVyeSUyMHRydWNrJTIwbG9naXN0aWNzfGVufDF8fHx8MTc3NDM2MDUyOXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
+                <SafeImage
+                  src="https://images.unsplash.com/photo-1760662052295-f84068499a03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZWxpdmVyeSUyMHRydWNrJTIwbG9naXN0aWNzfGVufDF8fHx8MTc3NDM2MDUyOXww&ixlib=rb-4.1.0&q=80&w=1080"
                   alt="Caminhão de transporte"
                   className="rounded-xl"
                 />
