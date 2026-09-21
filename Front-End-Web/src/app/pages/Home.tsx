@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { Truck, Clock, Shield, MapPin, ArrowRight, CheckCircle, Package, Star, TrendingUp, Users } from "lucide-react";
-import { ImageWithFallback } from "../components/figma/ImageWithFallback";
+import { ImageWithFallback } from "../components/imagefallback/ImageWithFallback";
 
 export function Home() {
   const features = [
