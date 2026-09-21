@@ -17,6 +17,9 @@ import { BulkUpload } from "./pages/BulkUpload";
 import { OperationalMap } from "./pages/OperationalMap";
 import { DocumentAdmin } from "./pages/DocumentAdmin";
 import { UserManagement } from "./pages/UserManagement";
+import { Subscription } from "./pages/Subscription";
+import { PlanManagement } from "./pages/PlanManagement";
+import { ApiKeys } from "./pages/ApiKeys";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
@@ -42,11 +45,14 @@ export const router = createBrowserRouter([
       { path: "cotacao", element: <Quote /> },
       { path: "login", element: <Login /> },
       { path: "cadastro", element: <Register /> },
-      { path: "cadastro-cargas", element: <ProtectedRoute><CargoRegistration /></ProtectedRoute> },
-      { path: "gestao-lotes", element: <ProtectedRoute><BulkUpload /></ProtectedRoute> },
+      { path: "cadastro-cargas", element: <ProtectedRoute roles={["admin", "empresa"]}><CargoRegistration /></ProtectedRoute> },
+      { path: "gestao-lotes", element: <ProtectedRoute roles={["admin", "empresa"]}><BulkUpload /></ProtectedRoute> },
       { path: "mapa-operacional", element: <ProtectedRoute><OperationalMap /></ProtectedRoute> },
-      { path: "admin-documentos", element: <ProtectedRoute><DocumentAdmin /></ProtectedRoute> },
-      { path: "admin-usuarios", element: <ProtectedRoute><UserManagement /></ProtectedRoute> },
+      { path: "admin-documentos", element: <ProtectedRoute roles={["admin"]}><DocumentAdmin /></ProtectedRoute> },
+      { path: "admin-usuarios", element: <ProtectedRoute roles={["admin"]}><UserManagement /></ProtectedRoute> },
+      { path: "checkout-assinatura", element: <ProtectedRoute roles={["empresa"]}><Subscription /></ProtectedRoute> },
+      { path: "gestao-planos", element: <ProtectedRoute roles={["empresa"]}><PlanManagement /></ProtectedRoute> },
+      { path: "chaves-api", element: <ProtectedRoute roles={["empresa"]}><ApiKeys /></ProtectedRoute> },
       { path: "trabalhe-conosco", element: <Careers /> },
       { path: "blog", element: <Blog /> },
       { path: "unidades", element: <Units /> },
