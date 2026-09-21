@@ -1,8 +1,8 @@
 import { useState, type ImgHTMLAttributes } from "react";
 
-type ImageWithFallbackProps = ImgHTMLAttributes<HTMLImageElement>;
+type SafeImageProps = ImgHTMLAttributes<HTMLImageElement>;
 
-export function ImageWithFallback({ src, alt, className, ...props }: ImageWithFallbackProps) {
+export function SafeImage({ src, alt, className, ...props }: SafeImageProps) {
   const [hasError, setHasError] = useState(false);
 
   if (hasError || !src) {

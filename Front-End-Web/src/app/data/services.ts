@@ -34,7 +34,7 @@ export const services: Service[] = [
       { value: "27", label: "UFs atendidas" },
     ],
     image:
-      "https://images.unsplash.com/photo-1760662052295-f84068499a03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZWxpdmVyeSUyMHRydWNrJTIwbG9naXN0aWNzfGVufDF8fHx8MTc3NDM2MDUyOXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1760662052295-f84068499a03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkZWxpdmVyeSUyMHRydWNrJTIwbG9naXN0aWNzfGVufDF8fHx8MTc3NDM2MDUyOXww&ixlib=rb-4.1.0&q=80&w=1080",
   },
   {
     slug: "carga-completa",
@@ -57,7 +57,7 @@ export const services: Service[] = [
       { value: "99%", label: "cumprimento de SLA" },
     ],
     image:
-      "https://images.unsplash.com/photo-1620059116993-398c21ce8406?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cnVjayUyMGZsZWV0JTIwdHJhbnNwb3J0fGVufDF8fHx8MTc3NDQzODkyM3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1620059116993-398c21ce8406?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cnVjayUyMGZsZWV0JTIwdHJhbnNwb3J0fGVufDF8fHx8MTc3NDQzODkyM3ww&ixlib=rb-4.1.0&q=80&w=1080",
   },
   {
     slug: "armazenagem",
@@ -80,7 +80,7 @@ export const services: Service[] = [
       { value: "D+0", label: "expedição possível" },
     ],
     image:
-      "https://images.unsplash.com/photo-1578351709091-33ee78a1565d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3YXJlaG91c2UlMjBzaGlwcGluZ3xlbnwxfHx8fDE3NzQ0Mzg5MjN8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      "https://images.unsplash.com/photo-1578351709091-33ee78a1565d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3YXJlaG91c2UlMjBzaGlwcGluZ3xlbnwxfHx8fDE3NzQ0Mzg5MjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
   },
   {
     slug: "entregas-expressas",

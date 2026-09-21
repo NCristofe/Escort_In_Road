@@ -16,6 +16,9 @@ import { CargoRegistration } from "./pages/CargoRegistration";
 import { BulkUpload } from "./pages/BulkUpload";
 import { OperationalMap } from "./pages/OperationalMap";
 import { DocumentAdmin } from "./pages/DocumentAdmin";
+import { EsgDashboard } from "./pages/EsgDashboard";
+import { FreightSavings } from "./pages/FreightSavings";
+import { FleetPerformance } from "./pages/FleetPerformance";
 import { UserManagement } from "./pages/UserManagement";
 import { Subscription } from "./pages/Subscription";
 import { PlanManagement } from "./pages/PlanManagement";
@@ -48,6 +51,9 @@ export const router = createBrowserRouter([
       { path: "cadastro-cargas", element: <ProtectedRoute roles={["admin", "empresa"]}><CargoRegistration /></ProtectedRoute> },
       { path: "gestao-lotes", element: <ProtectedRoute roles={["admin", "empresa"]}><BulkUpload /></ProtectedRoute> },
       { path: "mapa-operacional", element: <ProtectedRoute><OperationalMap /></ProtectedRoute> },
+      { path: "painel-esg", element: <ProtectedRoute roles={["admin", "empresa"]}><EsgDashboard /></ProtectedRoute> },
+      { path: "economia-frete", element: <ProtectedRoute roles={["admin", "empresa"]}><FreightSavings /></ProtectedRoute> },
+      { path: "performance", element: <ProtectedRoute roles={["admin", "empresa"]}><FleetPerformance /></ProtectedRoute> },
       { path: "admin-documentos", element: <ProtectedRoute roles={["admin"]}><DocumentAdmin /></ProtectedRoute> },
       { path: "admin-usuarios", element: <ProtectedRoute roles={["admin"]}><UserManagement /></ProtectedRoute> },
       { path: "checkout-assinatura", element: <ProtectedRoute roles={["empresa"]}><Subscription /></ProtectedRoute> },
