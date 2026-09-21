@@ -17,11 +17,14 @@ export function Header() {
     { path: "/mapa-operacional", label: "Mapa" },
     { path: "/admin-documentos", label: "Docs" },
     { path: "/admin-usuarios", label: "Users" },
+    { path: "/gestao-planos", label: "Plano" },
     { path: "/contato", label: "Contato" },
   ];
 
   const mobileNavItems = [
     ...navItems,
+    { path: "/checkout-assinatura", label: "Assinatura Premium" },
+    { path: "/chaves-api", label: "Chaves de API" },
     { path: "/tecnologia", label: "Tecnologia" },
     { path: "/clientes", label: "Clientes" },
     { path: "/faq", label: "FAQ" },
