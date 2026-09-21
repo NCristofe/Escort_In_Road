@@ -1,7 +1,17 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
-import { Building2, Lock, Mail, UserPlus } from "lucide-react";
-import { useAuth } from "../auth/AuthContext";
+import { Building2, Lock, Mail, Truck, UserPlus } from "lucide-react";
+import { useAuth, type Role } from "../auth/AuthContext";
+
+const accountTypes: { role: Extract<Role, "empresa" | "motorista">; label: string; description: string; icon: typeof Building2 }[] = [
+  { role: "empresa", label: "Empresa", description: "Cadastra cargas e importa lotes.", icon: Building2 },
+  { role: "motorista", label: "Motorista", description: "Consulta o mapa operacional.", icon: Truck },
+];
+
+const homeByRole: Record<Extract<Role, "empresa" | "motorista">, string> = {
+  empresa: "/cadastro-cargas",
+  motorista: "/mapa-operacional",
+};
 
 export function Register() {
   const navigate = useNavigate();
@@ -9,18 +19,20 @@ export function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<Extract<Role, "empresa" | "motorista">>("empresa");
   const [error, setError] = useState("");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const success = register(name, email, password);
+    const success = register(name, email, password, role);
 
     if (!success) {
-      setError("Preencha nome, e-mail e uma senha com pelo menos 6 caracteres.");
+      setError("Preencha nome, e-mail e uma senha com pelo menos 6 caracteres. Verifique se o e-mail ja esta cadastrado.");
       return;
     }
 
-    navigate("/admin-usuarios", { replace: true });
+    setError("");
+    navigate(homeByRole[role], { replace: true });
   };
 
   return (
@@ -32,16 +44,37 @@ export function Register() {
             Novo acesso
           </div>
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-5">
-            Cadastre um administrador
+            Crie seu cadastro
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl">
-            Ao criar o cadastro, o usuario entra automaticamente e passa a ver as telas administrativas no menu.
+            Escolha o tipo de conta para liberar as telas certas: empresas publicam cargas e importam lotes, motoristas
+            acompanham o mapa operacional. Contas administrativas nao sao criadas por aqui.
           </p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Cadastro</h2>
           <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <span className="block text-sm font-bold text-gray-700 mb-2">Tipo de conta</span>
+              <div className="grid grid-cols-2 gap-3">
+                {accountTypes.map((type) => (
+                  <button
+                    key={type.role}
+                    type="button"
+                    onClick={() => setRole(type.role)}
+                    className={`text-left border-2 rounded-lg p-4 transition-colors ${
+                      role === type.role ? "border-orange-600 bg-orange-50" : "border-gray-200 hover:border-orange-300"
+                    }`}
+                  >
+                    <type.icon className="w-5 h-5 text-orange-600 mb-2" />
+                    <div className="font-bold text-gray-900">{type.label}</div>
+                    <div className="text-xs text-gray-500">{type.description}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <label className="block">
               <span className="block text-sm font-bold text-gray-700 mb-2">Nome</span>
               <div className="relative">
