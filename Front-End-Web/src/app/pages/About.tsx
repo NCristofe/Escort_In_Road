@@ -11,10 +11,8 @@ export function About() {
   ];
 
   const timeline = [
-    { year: "2011", text: "Início da operação com foco em transporte rodoviário regional." },
-    { year: "2016", text: "Expansão da frota e abertura de rotas para todos os estados do Sudeste." },
-    { year: "2021", text: "Implantação de rastreamento digital e gestão integrada de cargas." },
-    { year: "2026", text: "Cobertura nacional com operação multimodal apoiada por tecnologia." },
+    { year: "2026", text: "Quando começou a ideia de implementar " },
+    { year: "2026", text: "Início da operação com foco em transporte rodoviário regional." },
   ];
 
   return (
