@@ -1,10 +1,22 @@
 import { useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Lock, LogIn, Mail, ShieldCheck } from "lucide-react";
-import { useAuth } from "../auth/AuthContext";
+import { useAuth, type Role } from "../auth/AuthContext";
 
 type LocationState = {
   from?: string;
+};
+
+const demoAccounts: { role: Role; label: string; email: string; password: string }[] = [
+  { role: "admin", label: "Administrador", email: "admin@escortinroad.com.br", password: "admin123" },
+  { role: "empresa", label: "Empresa", email: "empresa@escortinroad.com.br", password: "empresa123" },
+  { role: "motorista", label: "Motorista", email: "motorista@escortinroad.com.br", password: "motorista123" },
+];
+
+const homeByRole: Record<Role, string> = {
+  admin: "/admin-usuarios",
+  empresa: "/cadastro-cargas",
+  motorista: "/mapa-operacional",
 };
 
 export function Login() {
@@ -15,18 +27,21 @@ export function Login() {
   const [password, setPassword] = useState("admin123");
   const [error, setError] = useState("");
 
-  const from = (location.state as LocationState | null)?.from ?? "/admin-usuarios";
+  const from = (location.state as LocationState | null)?.from;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const success = login(email, password);
 
     if (!success) {
-      setError("Informe e-mail e senha para acessar.");
+      setError("E-mail ou senha invalidos. Use uma das contas de demonstracao ou crie um cadastro.");
       return;
     }
 
-    navigate(from, { replace: true });
+    setError("");
+    navigate(from ?? homeByRole[demoAccounts.find((account) => account.email === email)?.role ?? "empresa"], {
+      replace: true,
+    });
   };
 
   return (
@@ -40,9 +55,31 @@ export function Login() {
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-5">
             Entre para acessar as telas operacionais
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl">
-            As areas de cargas, lotes, mapa, documentos e usuarios ficam disponiveis somente apos autenticacao.
+          <p className="text-lg text-gray-600 max-w-2xl mb-8">
+            As areas de cargas, lotes, mapa, documentos e usuarios ficam disponiveis somente apos autenticacao. O acesso a
+            Central de Documentacao e a Gestao de Usuarios e restrito ao perfil Administrador.
           </p>
+
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <h2 className="font-bold text-gray-900 mb-4">Contas de demonstracao</h2>
+            <div className="grid sm:grid-cols-3 gap-3">
+              {demoAccounts.map((account) => (
+                <button
+                  key={account.role}
+                  type="button"
+                  onClick={() => {
+                    setEmail(account.email);
+                    setPassword(account.password);
+                    setError("");
+                  }}
+                  className="text-left border-2 border-gray-200 rounded-lg p-4 hover:border-orange-400 hover:bg-orange-50 transition-colors"
+                >
+                  <div className="font-bold text-gray-900">{account.label}</div>
+                  <div className="text-xs text-gray-500 break-words">{account.email}</div>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
