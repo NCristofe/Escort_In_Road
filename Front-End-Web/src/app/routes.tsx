@@ -1,35 +1,46 @@
+import { lazy, type ComponentType } from "react";
 import { createBrowserRouter } from "react-router";
 import { Root } from "./pages/Root";
-import { Home } from "./pages/Home";
-import { Services } from "./pages/Services";
-import { ServiceDetail } from "./pages/ServiceDetail";
-import { Tracking } from "./pages/Tracking";
-import { Contact } from "./pages/Contact";
-import { About } from "./pages/About";
-import { Blog } from "./pages/Blog";
-import { Careers } from "./pages/Careers";
-import { Clients } from "./pages/Clients";
-import { Coverage } from "./pages/Coverage";
-import { FAQ } from "./pages/FAQ";
-import { Quote } from "./pages/Quote";
-import { CargoRegistration } from "./pages/CargoRegistration";
-import { BulkUpload } from "./pages/BulkUpload";
-import { OperationalMap } from "./pages/OperationalMap";
-import { DocumentAdmin } from "./pages/DocumentAdmin";
-import { EsgDashboard } from "./pages/EsgDashboard";
-import { SubscriptionCheckout } from "./pages/SubscriptionCheckout";
-import { PlanManagement } from "./pages/PlanManagement";
-import { ApiKeys } from "./pages/ApiKeys";
-import { FreightSavings } from "./pages/FreightSavings";
-import { FleetPerformance } from "./pages/FleetPerformance";
-import { UserManagement } from "./pages/UserManagement";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
-import { Login } from "./pages/Login";
-import { Register } from "./pages/Register";
-import { Technology } from "./pages/Technology";
-import { Units } from "./pages/Units";
-import { PrivacyPolicy, TermsOfUse } from "./pages/Legal";
-import { NotFound } from "./pages/NotFound";
+
+/**
+ * Cada pagina vira um chunk proprio e so e baixada quando a rota e acessada.
+ * Enquanto o chunk chega, o <Suspense> do Root exibe o LoadingScreen.
+ */
+function page<K extends string>(load: () => Promise<Record<K, ComponentType>>, name: K) {
+  return lazy(() => load().then((module) => ({ default: module[name] })));
+}
+
+const Home = page(() => import("./pages/Home"), "Home");
+const Services = page(() => import("./pages/Services"), "Services");
+const ServiceDetail = page(() => import("./pages/ServiceDetail"), "ServiceDetail");
+const Tracking = page(() => import("./pages/Tracking"), "Tracking");
+const Contact = page(() => import("./pages/Contact"), "Contact");
+const About = page(() => import("./pages/About"), "About");
+const Blog = page(() => import("./pages/Blog"), "Blog");
+const Careers = page(() => import("./pages/Careers"), "Careers");
+const Clients = page(() => import("./pages/Clients"), "Clients");
+const Coverage = page(() => import("./pages/Coverage"), "Coverage");
+const FAQ = page(() => import("./pages/FAQ"), "FAQ");
+const Quote = page(() => import("./pages/Quote"), "Quote");
+const CargoRegistration = page(() => import("./pages/CargoRegistration"), "CargoRegistration");
+const BulkUpload = page(() => import("./pages/BulkUpload"), "BulkUpload");
+const OperationalMap = page(() => import("./pages/OperationalMap"), "OperationalMap");
+const DocumentAdmin = page(() => import("./pages/DocumentAdmin"), "DocumentAdmin");
+const EsgDashboard = page(() => import("./pages/EsgDashboard"), "EsgDashboard");
+const SubscriptionCheckout = page(() => import("./pages/SubscriptionCheckout"), "SubscriptionCheckout");
+const PlanManagement = page(() => import("./pages/PlanManagement"), "PlanManagement");
+const ApiKeys = page(() => import("./pages/ApiKeys"), "ApiKeys");
+const FreightSavings = page(() => import("./pages/FreightSavings"), "FreightSavings");
+const FleetPerformance = page(() => import("./pages/FleetPerformance"), "FleetPerformance");
+const UserManagement = page(() => import("./pages/UserManagement"), "UserManagement");
+const Login = page(() => import("./pages/Login"), "Login");
+const Register = page(() => import("./pages/Register"), "Register");
+const Technology = page(() => import("./pages/Technology"), "Technology");
+const Units = page(() => import("./pages/Units"), "Units");
+const PrivacyPolicy = page(() => import("./pages/Legal"), "PrivacyPolicy");
+const TermsOfUse = page(() => import("./pages/Legal"), "TermsOfUse");
+const NotFound = page(() => import("./pages/NotFound"), "NotFound");
 
 export const router = createBrowserRouter([
   {
