@@ -12,6 +12,7 @@ import {
   Tag,
   X,
 } from "lucide-react";
+import { LoadingScreen } from "../components/LoadingScreen";
 import { PageHero } from "../components/PageHero";
 import { useSubscription } from "../billing/SubscriptionContext";
 import {
@@ -249,6 +250,13 @@ export function SubscriptionCheckout() {
 
   return (
     <div>
+      {submitting && (
+        <LoadingScreen
+          variant="overlay"
+          message="Processando pagamento"
+          detail="Não feche nem atualize esta página."
+        />
+      )}
       <PageHero
         eyebrow="Assinatura"
         title="Migre para o Premium"
