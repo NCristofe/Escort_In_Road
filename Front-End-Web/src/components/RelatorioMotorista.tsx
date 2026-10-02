@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { format } from 'date-fns';
 import { pt } from 'date-fns/locale';
+import { RelatorioMotoristaDTO } from '../lib/relatorio-client';
 
 interface KPI {
   label: string;
@@ -26,8 +27,10 @@ export const RelatorioMotorista: React.FC<RelatorioMotoristaProps> = ({ motorist
   const [dataInicio, setDataInicio] = useState<string>('');
   const [dataFim, setDataFim] = useState<string>('');
   const [loading, setLoading] = useState(false);
-  const [relatorio, setRelatorio] = useState<any>(null);
+  const [relatorio, setRelatorio] = useState<RelatorioMotoristaDTO | null>(null);
   const [erro, setErro] = useState<string>('');
+  const [exportandoPDF, setExportandoPDF] = useState(false);
+  const [exportandoCSV, setExportandoCSV] = useState(false);
 
   useEffect(() => {
     const agora = new Date();
@@ -43,12 +46,18 @@ export const RelatorioMotorista: React.FC<RelatorioMotoristaProps> = ({ motorist
       return;
     }
 
+    if (dataInicio >= dataFim) {
+      setErro('Data inicial deve ser anterior à data final');
+      return;
+    }
+
     setLoading(true);
     setErro('');
 
     try {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
       const response = await fetch(
-        `/api/relatorios/motorista/receita?inicio=${dataInicio}&fim=${dataFim}`,
+        `${apiUrl}/api/relatorios/motorista/receita?inicio=${dataInicio}&fim=${dataFim}`,
         {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -57,25 +66,96 @@ export const RelatorioMotorista: React.FC<RelatorioMotoristaProps> = ({ motorist
       );
 
       if (!response.ok) {
-        throw new Error('Erro ao carregar relatório');
+        if (response.status === 401) {
+          throw new Error('Sessão expirada. Faça login novamente');
+        }
+        throw new Error(`Erro ${response.status}: ${response.statusText}`);
       }
 
-      const dados = await response.json();
+      const dados: RelatorioMotoristaDTO = await response.json();
       setRelatorio(dados);
     } catch (err) {
-      setErro('Falha ao carregar relatório. Tente novamente.');
+      setErro(err instanceof Error ? err.message : 'Falha ao carregar relatório. Tente novamente.');
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const exportarPDF = () => {
-    window.location.href = `/api/relatorios/motorista/receita/export?formato=pdf&inicio=${dataInicio}&fim=${dataFim}`;
+  const exportarPDF = async () => {
+    if (!dataInicio || !dataFim) {
+      setErro('Gere o relatório primeiro');
+      return;
+    }
+
+    setExportandoPDF(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+      const url = `${apiUrl}/api/relatorios/motorista/receita/export?formato=pdf&inicio=${dataInicio}&fim=${dataFim}`;
+
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao exportar PDF');
+      }
+
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `relatorio-receita-${dataInicio}_${dataFim}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (err) {
+      setErro('Erro ao exportar PDF. Tente novamente.');
+      console.error(err);
+    } finally {
+      setExportandoPDF(false);
+    }
   };
 
-  const exportarCSV = () => {
-    window.location.href = `/api/relatorios/motorista/receita/export?formato=csv&inicio=${dataInicio}&fim=${dataFim}`;
+  const exportarCSV = async () => {
+    if (!dataInicio || !dataFim) {
+      setErro('Gere o relatório primeiro');
+      return;
+    }
+
+    setExportandoCSV(true);
+    try {
+      const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+      const url = `${apiUrl}/api/relatorios/motorista/receita/export?formato=csv&inicio=${dataInicio}&fim=${dataFim}`;
+
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao exportar CSV');
+      }
+
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `relatorio-receita-${dataInicio}_${dataFim}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (err) {
+      setErro('Erro ao exportar CSV. Tente novamente.');
+      console.error(err);
+    } finally {
+      setExportandoCSV(false);
+    }
   };
 
   const formatarMoeda = (valor: number) => {
@@ -162,19 +242,19 @@ export const RelatorioMotorista: React.FC<RelatorioMotoristaProps> = ({ motorist
             <div className="flex items-end gap-2">
               <button
                 onClick={exportarPDF}
-                disabled={!relatorio}
+                disabled={!relatorio || exportandoPDF}
                 className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 disabled:opacity-50 transition text-sm"
                 title="Exportar em PDF"
               >
-                📄 PDF
+                {exportandoPDF ? '⏳ Exportando...' : '📄 PDF'}
               </button>
               <button
                 onClick={exportarCSV}
-                disabled={!relatorio}
+                disabled={!relatorio || exportandoCSV}
                 className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition text-sm"
                 title="Exportar em CSV"
               >
-                📊 CSV
+                {exportandoCSV ? '⏳ Exportando...' : '📊 CSV'}
               </button>
             </div>
           </div>
