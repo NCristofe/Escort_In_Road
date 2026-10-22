@@ -1,48 +1,29 @@
-import { Truck } from "lucide-react";
-
 type LoadingScreenProps = {
-  /** Texto principal exibido abaixo da animacao. */
+  /** Texto principal exibido abaixo do spinner. */
   message?: string;
-  /** Linha de apoio, em tom mais discreto. */
+  /** Linha de apoio, em tom mais discreto. Omitida quando nao ha o que explicar. */
   detail?: string;
   /**
-   * "page": ocupa a area de conteudo entre o header e o footer.
-   * "overlay": cobre a tela inteira, bloqueando interacao (ex.: pagamento em andamento).
+   * "page": ocupa a area de conteudo (primeira carga do app).
+   * "overlay": cobre a tela e bloqueia interacao (ex.: pagamento em andamento).
    */
   variant?: "page" | "overlay";
 };
 
-export function LoadingScreen({
-  message = "Carregando",
-  detail = "Preparando a rota para você...",
-  variant = "page",
-}: LoadingScreenProps) {
+/**
+ * Uma animacao so, e nenhuma marca piscando: telas de espera aparecem por
+ * fracoes de segundo, e qualquer coisa alem de um spinner sobra na tela.
+ */
+export function LoadingScreen({ message = "Carregando", detail, variant = "page" }: LoadingScreenProps) {
   const content = (
     <div
       role="status"
       aria-live="polite"
       className="loading-appear flex flex-col items-center text-center px-4"
     >
-      {/* Caminhao sobre a estrada */}
-      <div className="relative w-64 max-w-full mb-8">
-        <div className="loading-truck relative z-10 mx-auto w-fit bg-orange-600 p-3 rounded-xl shadow-lg shadow-orange-600/30">
-          <Truck className="w-9 h-9 text-white" aria-hidden="true" />
-        </div>
-        <div className="relative h-6 -mt-1 rounded-full bg-gray-800 overflow-hidden">
-          <div className="loading-road absolute inset-0" />
-        </div>
-      </div>
-
-      <div className="font-bold text-2xl text-gray-900">
-        ESCORT<span className="text-orange-600">in</span>Road
-      </div>
-      <p className="mt-3 font-bold text-gray-900">{message}</p>
-      <p className="text-sm text-gray-600">{detail}</p>
-
-      {/* Barra de progresso indeterminada */}
-      <div className="mt-6 w-48 h-1.5 rounded-full bg-orange-100 overflow-hidden">
-        <div className="loading-progress h-full w-2/5 rounded-full bg-orange-600" />
-      </div>
+      <div className="loading-spinner w-10 h-10 rounded-full border-[3px] border-gray-200 border-t-orange-600" />
+      <p className="mt-5 font-bold text-gray-900">{message}</p>
+      {detail && <p className="mt-1 text-sm text-gray-600">{detail}</p>}
     </div>
   );
 
