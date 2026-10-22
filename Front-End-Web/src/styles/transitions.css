@@ -1,0 +1,26 @@
+/* Transicao de entrada das paginas, aplicada a cada troca de rota. */
+
+@keyframes page-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/*
+ * Fade curto, sem `transform`, de proposito: um transform no container cria um
+ * containing block novo e passaria a valer para os filhos `sticky` (as colunas
+ * laterais de planos e checkout) e `fixed`, alem de atrapalhar a medicao do
+ * mapa Leaflet, que inicializa justamente durante a animacao.
+ *
+ * A animacao e so de entrada. Animar a saida exigiria segurar a pagina velha
+ * na tela ate o fade terminar, o que adiciona espera a cada clique — o oposto
+ * do que se quer numa navegacao.
+ */
+.page-enter {
+  animation: page-enter 0.25s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+}
