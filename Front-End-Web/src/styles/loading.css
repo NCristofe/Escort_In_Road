@@ -1,18 +1,17 @@
-/* Animacoes das telas de carregamento (LoadingScreen e splash do index.html). */
+/* Animacoes da tela de carregamento, da barra de rota e do splash do index.html. */
 
-@keyframes loading-road {
-  from { background-position-x: 0; }
-  to { background-position-x: -48px; }
+@keyframes loading-spin {
+  to { transform: rotate(360deg); }
 }
 
-@keyframes loading-truck {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-@keyframes loading-progress {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(250%); }
+/*
+ * A barra nunca chega ao fim: ela e removida da tela quando a rota termina de
+ * carregar. Fingir 100% antes disso faria a pagina parecer travada no final.
+ */
+@keyframes route-progress {
+  0% { transform: scaleX(0.03); }
+  50% { transform: scaleX(0.6); }
+  100% { transform: scaleX(0.92); }
 }
 
 @keyframes loading-appear {
@@ -20,36 +19,31 @@
   to { opacity: 1; }
 }
 
-/* Faixa central da estrada, correndo para a esquerda para dar sensacao de movimento. */
-.loading-road {
-  background-image: linear-gradient(90deg, #fdba74 0 24px, transparent 24px 48px);
-  background-size: 48px 4px;
-  background-repeat: repeat-x;
-  background-position-y: center;
-  animation: loading-road 0.6s linear infinite;
+.loading-spinner {
+  animation: loading-spin 0.7s linear infinite;
 }
 
-.loading-truck {
-  animation: loading-truck 0.5s ease-in-out infinite;
-}
-
-.loading-progress {
-  animation: loading-progress 1.4s ease-in-out infinite;
+.route-progress-bar {
+  transform-origin: left center;
+  animation: route-progress 2.2s ease-out forwards;
 }
 
 /*
- * Carregamentos rapidos nao devem piscar na tela: o loader so aparece
- * depois de um pequeno atraso.
+ * Esperas de milissegundos nao devem piscar na tela: o conteudo do loader
+ * entra com um atraso curto, e cargas rapidas terminam antes de ele aparecer.
  */
 .loading-appear {
   opacity: 0;
-  animation: loading-appear 0.3s ease-out 0.15s forwards;
+  animation: loading-appear 0.25s ease-out 0.15s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .loading-road,
-  .loading-truck,
-  .loading-progress {
+  .loading-spinner {
     animation: none;
+  }
+
+  .route-progress-bar {
+    animation: none;
+    transform: scaleX(0.5);
   }
 }
