@@ -1,26 +1,31 @@
-import { Suspense } from "react";
-import { Outlet, useLocation } from "react-router";
+import { Outlet, ScrollRestoration, useLocation } from "react-router";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
-import { LoadingScreen } from "../components/LoadingScreen";
+import { RouteProgress } from "../components/RouteProgress";
 
 export function Root() {
   const location = useLocation();
 
   return (
     <div className="min-h-screen flex flex-col">
+      <RouteProgress />
       <Header />
       <main className="flex-1">
         {/*
-         * A key por rota monta uma boundary nova a cada navegacao. Sem ela, como o
-         * React Router navega dentro de uma transicao, a pagina anterior ficaria
-         * congelada na tela enquanto o chunk da proxima baixa, sem feedback nenhum.
+         * A key muda a cada rota, o que remonta o conteudo e dispara a animacao
+         * de entrada. Sem isso a pagina nova apareceria num corte seco.
          */}
-        <Suspense key={location.pathname} fallback={<LoadingScreen />}>
+        <div key={location.pathname} className="page-enter">
           <Outlet />
-        </Suspense>
+        </div>
       </main>
       <Footer />
+      {/*
+       * Leva a pagina nova para o topo e devolve a altura antiga no voltar do
+       * navegador. Sem isto, clicar num link com a pagina rolada abre a proxima
+       * no meio do conteudo.
+       */}
+      <ScrollRestoration />
     </div>
   );
 }
