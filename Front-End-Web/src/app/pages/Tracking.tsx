@@ -1,5 +1,24 @@
-import { useState } from "react";
-import { Search, Package, MapPin, Clock, CheckCircle, Truck, Calendar, ArrowRight } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import {
+  Search,
+  Package,
+  MapPin,
+  Clock,
+  CheckCircle,
+  Truck,
+  Calendar,
+  ArrowRight,
+  PackageX,
+  AlertCircle,
+} from "lucide-react";
+import {
+  findShipment,
+  isValidTrackingCode,
+  normalizeTrackingCode,
+  sampleTrackingCodes,
+  type Shipment,
+  type ShipmentStatus,
+} from "../data/tracking";
 
 const dateFormatter = new Intl.DateTimeFormat("pt-BR");
 const timeFormatter = new Intl.DateTimeFormat("pt-BR", {
@@ -7,77 +26,40 @@ const timeFormatter = new Intl.DateTimeFormat("pt-BR", {
   minute: "2-digit",
 });
 
-function addDays(date: Date, days: number) {
-  const nextDate = new Date(date);
-  nextDate.setDate(nextDate.getDate() + days);
-  return nextDate;
+function formatDateTime(date: Date) {
+  return `${dateFormatter.format(date)} às ${timeFormatter.format(date)}`;
 }
 
-function withTime(date: Date, hours: number, minutes: number) {
-  const nextDate = new Date(date);
-  nextDate.setHours(hours, minutes, 0, 0);
-  return nextDate;
-}
+const statusClasses: Record<ShipmentStatus, string> = {
+  "Coleta Agendada": "bg-gray-700",
+  "Em Trânsito": "bg-orange-600",
+  "Saiu para Entrega": "bg-blue-600",
+  Entregue: "bg-green-600",
+};
+
+/** O que a ultima consulta produziu. Null enquanto ninguem buscou nada. */
+type SearchResult =
+  | { kind: "found"; shipment: Shipment }
+  | { kind: "invalid"; code: string }
+  | { kind: "not-found"; code: string };
 
 export function Tracking() {
   const [trackingCode, setTrackingCode] = useState("");
-  const [searchPerformed, setSearchPerformed] = useState(false);
+  const [result, setResult] = useState<SearchResult | null>(null);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (trackingCode.trim()) {
-      setSearchPerformed(true);
+  const handleSearch = (event: FormEvent) => {
+    event.preventDefault();
+
+    const code = normalizeTrackingCode(trackingCode);
+    if (!code) return;
+
+    if (!isValidTrackingCode(code)) {
+      setResult({ kind: "invalid", code });
+      return;
     }
-  };
 
-  const now = new Date();
-  const deliveryDate = withTime(addDays(now, 1), 14, 0);
-  const currentEventDate = withTime(now, 14, 30);
-  const departureDate = withTime(now, 8, 15);
-  const collectedDate = withTime(addDays(now, -1), 16, 45);
-  const scheduledDate = withTime(addDays(now, -1), 9, 0);
-
-  // Mock tracking data
-  const trackingData = {
-    code: trackingCode || "TRL123456789",
-    status: "Em Trânsito",
-    origin: "São Paulo - SP",
-    destination: "Rio de Janeiro - RJ",
-    estimatedDelivery: `${dateFormatter.format(deliveryDate)} às ${timeFormatter.format(deliveryDate)}`,
-    currentLocation: "Rodovia Presidente Dutra - KM 180 - Guarulhos/SP",
-    driver: "Carlos Silva",
-    vehicle: "Caminhão Mercedes-Benz Actros - Placa ABC-1234",
-    progress: 65,
-    events: [
-      {
-        date: dateFormatter.format(currentEventDate),
-        time: timeFormatter.format(currentEventDate),
-        description: "Mercadoria em trânsito",
-        location: "Rodovia Presidente Dutra - KM 180 - Guarulhos/SP",
-        status: "current",
-      },
-      {
-        date: dateFormatter.format(departureDate),
-        time: timeFormatter.format(departureDate),
-        description: "Saída do Centro de Distribuição",
-        location: "CD São Paulo - Zona Leste",
-        status: "completed",
-      },
-      {
-        date: dateFormatter.format(collectedDate),
-        time: timeFormatter.format(collectedDate),
-        description: "Mercadoria coletada no remetente",
-        location: "São Paulo - SP",
-        status: "completed",
-      },
-      {
-        date: dateFormatter.format(scheduledDate),
-        time: timeFormatter.format(scheduledDate),
-        description: "Coleta agendada",
-        location: "Sistema ESCORTinRoad",
-        status: "completed",
-      },
-    ],
+    const shipment = findShipment(code);
+    setResult(shipment ? { kind: "found", shipment } : { kind: "not-found", code });
   };
 
   return (
@@ -100,7 +82,8 @@ export function Tracking() {
                   type="text"
                   placeholder="Digite o código de rastreamento (ex: TRL123456789)"
                   value={trackingCode}
-                  onChange={(e) => setTrackingCode(e.target.value)}
+                  onChange={(event) => setTrackingCode(event.target.value)}
+                  aria-label="Código de rastreamento"
                   className="w-full px-6 py-4 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-4 focus:ring-orange-300 text-lg"
                 />
               </div>
@@ -112,38 +95,111 @@ export function Tracking() {
                 Rastrear
               </button>
             </form>
+
+            {/* Cargas de demonstracao, para dar o que testar sem backend. */}
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-sm">
+              <span className="text-orange-100">Códigos de exemplo:</span>
+              {sampleTrackingCodes.map((sample) => (
+                <button
+                  key={sample.code}
+                  type="button"
+                  onClick={() => {
+                    setTrackingCode(sample.code);
+                    const shipment = findShipment(sample.code);
+                    if (shipment) setResult({ kind: "found", shipment });
+                  }}
+                  title={sample.status}
+                  className="font-mono font-semibold bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  {sample.code}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
+      {/* Codigo fora do formato */}
+      {result?.kind === "invalid" && (
+        <section className="py-12 lg:py-16 bg-gray-50">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-5">
+                <AlertCircle className="w-8 h-8 text-amber-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Código fora do formato</h2>
+              <p className="text-gray-600">
+                O código de rastreamento tem as letras <strong>TRL</strong> seguidas de nove números,
+                como <span className="font-mono font-semibold">TRL123456789</span>. Confira o código
+                informado no comprovante de coleta.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Codigo valido, carga inexistente */}
+      {result?.kind === "not-found" && (
+        <section className="py-12 lg:py-16 bg-gray-50">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-5">
+                <PackageX className="w-8 h-8 text-gray-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Nenhuma carga encontrada</h2>
+              <p className="text-gray-600 mb-6">
+                Não localizamos nenhuma carga com o código{" "}
+                <span className="font-mono font-semibold text-gray-900">{result.code}</span>. Cargas
+                coletadas há menos de duas horas podem ainda não constar no sistema.
+              </p>
+              <a
+                href="tel:08007771234"
+                className="inline-flex items-center gap-2 bg-orange-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-700 transition-colors"
+              >
+                Falar com o atendimento
+                <ArrowRight className="w-5 h-5" />
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Tracking Results */}
-      {searchPerformed && (
+      {result?.kind === "found" && (
         <section className="py-12 lg:py-16 bg-gray-50">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Progress Bar */}
             <div className="bg-white rounded-2xl shadow-xl p-6 lg:p-8 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold text-gray-900">Status da Entrega</h2>
-                <span className="bg-orange-600 text-white px-4 py-2 rounded-lg font-bold text-sm">
-                  {trackingData.status}
+                <span
+                  className={`text-white px-4 py-2 rounded-lg font-bold text-sm ${
+                    statusClasses[result.shipment.status]
+                  }`}
+                >
+                  {result.shipment.status}
                 </span>
               </div>
-              
+
               <div className="mb-6">
                 <div className="flex justify-between text-sm text-gray-600 mb-2">
                   <span>Progresso da Entrega</span>
-                  <span className="font-bold text-orange-600">{trackingData.progress}%</span>
+                  <span className="font-bold text-orange-600">{result.shipment.progress}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-orange-500 to-orange-600 h-3 rounded-full transition-all duration-500"
-                    style={{ width: `${trackingData.progress}%` }}
+                  <div
+                    className={`h-3 rounded-full transition-all duration-500 ${
+                      result.shipment.deliveredAt
+                        ? "bg-gradient-to-r from-green-500 to-green-600"
+                        : "bg-gradient-to-r from-orange-500 to-orange-600"
+                    }`}
+                    style={{ width: `${result.shipment.progress}%` }}
                   ></div>
                 </div>
               </div>
 
               <div className="text-sm text-gray-500 mb-1">Código de Rastreamento</div>
-              <div className="text-xl font-bold text-gray-900 mb-6">{trackingData.code}</div>
+              <div className="text-xl font-bold text-gray-900 mb-6 font-mono">{result.shipment.code}</div>
 
               <div className="grid md:grid-cols-3 gap-6">
                 <div className="flex items-start gap-3">
@@ -152,7 +208,7 @@ export function Tracking() {
                   </div>
                   <div>
                     <div className="text-sm text-gray-500 mb-1">Origem</div>
-                    <div className="font-bold text-gray-900">{trackingData.origin}</div>
+                    <div className="font-bold text-gray-900">{result.shipment.origin}</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -161,7 +217,7 @@ export function Tracking() {
                   </div>
                   <div>
                     <div className="text-sm text-gray-500 mb-1">Destino</div>
-                    <div className="font-bold text-gray-900">{trackingData.destination}</div>
+                    <div className="font-bold text-gray-900">{result.shipment.destination}</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -169,30 +225,50 @@ export function Tracking() {
                     <Calendar className="w-5 h-5 text-orange-600" />
                   </div>
                   <div>
-                    <div className="text-sm text-gray-500 mb-1">Previsão de Entrega</div>
-                    <div className="font-bold text-gray-900">{trackingData.estimatedDelivery}</div>
+                    <div className="text-sm text-gray-500 mb-1">
+                      {result.shipment.deliveredAt ? "Entregue em" : "Previsão de Entrega"}
+                    </div>
+                    <div className="font-bold text-gray-900">
+                      {result.shipment.deliveredAt
+                        ? formatDateTime(result.shipment.deliveredAt)
+                        : result.shipment.estimatedDelivery
+                          ? formatDateTime(result.shipment.estimatedDelivery)
+                          : "—"}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Current Location */}
-            <div className="bg-gradient-to-r from-orange-600 to-orange-700 rounded-2xl shadow-xl p-6 lg:p-8 mb-6 text-white">
+            <div
+              className={`rounded-2xl shadow-xl p-6 lg:p-8 mb-6 text-white ${
+                result.shipment.deliveredAt
+                  ? "bg-gradient-to-r from-green-600 to-green-700"
+                  : "bg-gradient-to-r from-orange-600 to-orange-700"
+              }`}
+            >
               <div className="flex items-start gap-4">
                 <div className="bg-white/20 p-3 rounded-xl">
-                  <Truck className="w-6 h-6 text-white" />
+                  {result.shipment.deliveredAt ? (
+                    <CheckCircle className="w-6 h-6 text-white" />
+                  ) : (
+                    <Truck className="w-6 h-6 text-white" />
+                  )}
                 </div>
                 <div className="flex-1">
-                  <div className="font-bold text-lg mb-1">Localização Atual</div>
-                  <div className="text-orange-100 mb-3">{trackingData.currentLocation}</div>
+                  <div className="font-bold text-lg mb-1">
+                    {result.shipment.deliveredAt ? "Entrega concluída" : "Localização Atual"}
+                  </div>
+                  <div className="text-white/80 mb-3">{result.shipment.currentLocation}</div>
                   <div className="grid sm:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-orange-100">Motorista:</span>
-                      <span className="font-semibold ml-2">{trackingData.driver}</span>
+                      <span className="text-white/80">Motorista:</span>
+                      <span className="font-semibold ml-2">{result.shipment.driver}</span>
                     </div>
                     <div>
-                      <span className="text-orange-100">Veículo:</span>
-                      <span className="font-semibold ml-2">{trackingData.vehicle}</span>
+                      <span className="text-white/80">Veículo:</span>
+                      <span className="font-semibold ml-2">{result.shipment.vehicle}</span>
                     </div>
                   </div>
                 </div>
@@ -205,36 +281,36 @@ export function Tracking() {
                 <Clock className="w-6 h-6 text-orange-600" />
                 Histórico de Movimentação
               </h2>
-              
+
               <div className="space-y-6">
-                {trackingData.events.map((event, index) => (
-                  <div key={index} className="flex gap-4">
+                {result.shipment.events.map((event, index) => (
+                  <div key={`${event.description}-${index}`} className="flex gap-4">
                     <div className="flex flex-col items-center">
                       <div
                         className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg ${
-                          event.status === "current"
-                            ? "bg-orange-600 ring-4 ring-orange-100"
-                            : "bg-green-500"
+                          event.current ? "bg-orange-600 ring-4 ring-orange-100" : "bg-green-500"
                         }`}
                       >
-                        {event.status === "current" ? (
+                        {event.current ? (
                           <Truck className="w-6 h-6 text-white" />
                         ) : (
                           <CheckCircle className="w-6 h-6 text-white" />
                         )}
                       </div>
-                      {index < trackingData.events.length - 1 && (
+                      {index < result.shipment.events.length - 1 && (
                         <div className="w-0.5 h-full min-h-[80px] bg-gray-300 mt-2" />
                       )}
                     </div>
                     <div className="flex-1 pb-8">
                       <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-2">
-                        <span className={`font-bold text-lg ${event.status === "current" ? "text-orange-600" : "text-gray-900"}`}>
+                        <span
+                          className={`font-bold text-lg ${
+                            event.current ? "text-orange-600" : "text-gray-900"
+                          }`}
+                        >
                           {event.description}
                         </span>
-                        <span className="text-sm text-gray-500">
-                          {event.date} às {event.time}
-                        </span>
+                        <span className="text-sm text-gray-500">{formatDateTime(event.at)}</span>
                       </div>
                       <div className="text-gray-600 flex items-center gap-2">
                         <MapPin className="w-4 h-4" />
@@ -250,7 +326,7 @@ export function Tracking() {
       )}
 
       {/* Info Section */}
-      {!searchPerformed && (
+      {!result && (
         <section className="py-16 bg-white">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">

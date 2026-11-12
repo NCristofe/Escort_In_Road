@@ -1,16 +1,59 @@
-
   <!DOCTYPE html>
-  <html lang="en">
+  <html lang="pt-BR">
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>ESCORTinRoad &mdash; Transporte e Logística</title>
-      <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
+      <style>
+        html, body { height: 100%; margin: 0; }
+        #root { height: 100%; }
+
+        /*
+         * Splash exibido enquanto o JavaScript carrega; o React substitui o
+         * conteudo do #root ao montar. Uma animacao so, para nao chamar mais
+         * atencao que a propria pagina que vem depois.
+         */
+        .splash {
+          height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+          background: #f9fafb; font-family: ui-sans-serif, system-ui, sans-serif; color: #111827; text-align: center;
+        }
+        .splash-logo { display: flex; align-items: center; gap: 12px; }
+        .splash-logo-tile { background: #ea580c; padding: 10px; border-radius: 10px; display: flex; }
+        .splash-logo-tile svg { display: block; width: 28px; height: 28px; }
+        .splash-brand { font-weight: 700; font-size: 22px; line-height: 1.1; text-align: left; }
+        .splash-brand span { color: #ea580c; }
+        .splash-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: #ea580c; }
+        .splash-spinner {
+          width: 40px; height: 40px; margin-top: 32px; border-radius: 50%;
+          border: 3px solid #e5e7eb; border-top-color: #ea580c;
+          animation: splash-spin 0.7s linear infinite;
+        }
+        @keyframes splash-spin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) { .splash-spinner { animation: none; } }
+      </style>
     </head>
 
     <body>
-      <div id="root"></div>
+      <div id="root">
+        <div class="splash" role="status" aria-live="polite">
+          <div class="splash-logo">
+            <div class="splash-logo-tile">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+                <path d="M15 18H9" />
+                <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+                <circle cx="17" cy="18" r="2" />
+                <circle cx="7" cy="18" r="2" />
+              </svg>
+            </div>
+            <div>
+              <div class="splash-brand">ESCORT<span>in</span>Road</div>
+              <div class="splash-tag">TRANSPORTE E LOGÍSTICA</div>
+            </div>
+          </div>
+          <div class="splash-spinner"></div>
+        </div>
+      </div>
       <script type="module" src="/src/main.tsx"></script>
     </body>
   </html>
-  

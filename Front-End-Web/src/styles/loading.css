@@ -1,0 +1,49 @@
+/* Animacoes da tela de carregamento, da barra de rota e do splash do index.html. */
+
+@keyframes loading-spin {
+  to { transform: rotate(360deg); }
+}
+
+/*
+ * A barra nunca chega ao fim: ela e removida da tela quando a rota termina de
+ * carregar. Fingir 100% antes disso faria a pagina parecer travada no final.
+ */
+@keyframes route-progress {
+  0% { transform: scaleX(0.03); }
+  50% { transform: scaleX(0.6); }
+  100% { transform: scaleX(0.92); }
+}
+
+@keyframes loading-appear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.loading-spinner {
+  animation: loading-spin 0.7s linear infinite;
+}
+
+.route-progress-bar {
+  transform-origin: left center;
+  animation: route-progress 2.2s ease-out forwards;
+}
+
+/*
+ * Esperas de milissegundos nao devem piscar na tela: o conteudo do loader
+ * entra com um atraso curto, e cargas rapidas terminam antes de ele aparecer.
+ */
+.loading-appear {
+  opacity: 0;
+  animation: loading-appear 0.25s ease-out 0.15s forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner {
+    animation: none;
+  }
+
+  .route-progress-bar {
+    animation: none;
+    transform: scaleX(0.5);
+  }
+}
