@@ -2,10 +2,12 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { Building2, Lock, Mail, UserPlus } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
+import { useSettings } from "../settings/SettingsContext";
 
 export function Register() {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { settings } = useSettings();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,7 +22,7 @@ export function Register() {
       return;
     }
 
-    navigate("/admin-usuarios", { replace: true });
+    navigate(settings.homePage, { replace: true });
   };
 
   return (
