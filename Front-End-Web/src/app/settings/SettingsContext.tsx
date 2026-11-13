@@ -16,8 +16,11 @@ export type Settings = {
     channels: Record<NotificationChannel, boolean>;
     events: Record<NotificationEvent, boolean>;
   };
-  /** Página aberta depois do login, quando o usuário não veio de uma rota protegida. */
-  homePage: PanelPath;
+  /**
+   * Página aberta depois do login, quando o usuário não veio de uma rota protegida.
+   * null = padrão do perfil (ver defaultHomeByRole).
+   */
+  homePage: PanelPath | null;
   /** Painéis escondidos do menu "Painéis" (continuam acessíveis pela URL). */
   hiddenPanels: PanelPath[];
   fontScale: FontScale;
@@ -36,7 +39,7 @@ export const defaultSettings: Settings = {
       weeklyReport: false,
     },
   },
-  homePage: "/admin-usuarios",
+  homePage: null,
   hiddenPanels: [],
   fontScale: "normal",
   reduceMotion: false,
@@ -61,6 +64,10 @@ const SettingsContext = createContext<SettingsContextValue | undefined>(undefine
 
 const validPanelPaths = new Set<string>(panelItems.map((item) => item.path));
 
+function isPanelPath(value: unknown): value is PanelPath {
+  return typeof value === "string" && validPanelPaths.has(value);
+}
+
 function readStoredSettings(): Settings {
   try {
     const raw = localStorage.getItem(settingsStorageKey);
@@ -74,9 +81,8 @@ function readStoredSettings(): Settings {
         channels: { ...defaultSettings.notifications.channels, ...stored.notifications?.channels },
         events: { ...defaultSettings.notifications.events, ...stored.notifications?.events },
       },
-      homePage:
-        stored.homePage && validPanelPaths.has(stored.homePage) ? stored.homePage : defaultSettings.homePage,
-      hiddenPanels: (stored.hiddenPanels ?? []).filter((path) => validPanelPaths.has(path)),
+      homePage: isPanelPath(stored.homePage) ? stored.homePage : defaultSettings.homePage,
+      hiddenPanels: (stored.hiddenPanels ?? []).filter(isPanelPath),
       fontScale: stored.fontScale && stored.fontScale in fontScalePx ? stored.fontScale : defaultSettings.fontScale,
     };
   } catch {
