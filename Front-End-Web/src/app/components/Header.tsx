@@ -1,11 +1,14 @@
-import { Link, useLocation } from "react-router";
-import { Truck, Menu, X, Phone, ChevronDown, Settings as SettingsIcon } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router";
+import { Truck, Menu, X, Phone, ChevronDown, LogOut, Settings as SettingsIcon, UserCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { panelItems as allPanelItems, settingsPath } from "../data/panels";
+import { useAuth } from "../auth/AuthContext";
+import { panelsForRole, settingsPath } from "../data/panels";
 import { useSettings } from "../settings/SettingsContext";
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [panelsOpen, setPanelsOpen] = useState(false);
   const panelsRef = useRef<HTMLDivElement | null>(null);
@@ -19,14 +22,16 @@ export function Header() {
     { path: "/contato", label: "Contato" },
   ];
 
-  /** Painéis internos: agrupados para o menu não estourar a largura do header. */
+  /** Só os painéis que o perfil logado pode abrir, menos os escondidos em Configurações. */
   const { settings } = useSettings();
-  const panelItems = allPanelItems.filter((item) => !settings.hiddenPanels.includes(item.path));
+  const panelItems = user
+    ? panelsForRole(user.role).filter((item) => !settings.hiddenPanels.includes(item.path))
+    : [];
 
   const mobileNavItems = [
     ...navItems,
     ...panelItems,
-    { path: settingsPath, label: "Configurações" },
+    ...(isAuthenticated ? [{ path: settingsPath, label: "Configurações" }] : []),
     { path: "/tecnologia", label: "Tecnologia" },
     { path: "/clientes", label: "Clientes" },
     { path: "/faq", label: "FAQ" },
@@ -34,6 +39,12 @@ export function Header() {
     { path: "/unidades", label: "Unidades" },
     { path: "/trabalhe-conosco", label: "Trabalhe Conosco" },
   ];
+
+  function handleLogout() {
+    logout();
+    setMobileMenuOpen(false);
+    navigate("/");
+  }
 
   useEffect(() => {
     setPanelsOpen(false);
@@ -113,57 +124,81 @@ export function Header() {
                 </Link>
               ))}
 
-              <div className="relative" ref={panelsRef}>
-                <button
-                  type="button"
-                  onClick={() => setPanelsOpen((open) => !open)}
-                  aria-expanded={panelsOpen}
-                  aria-haspopup="true"
-                  className={`flex items-center gap-1 font-semibold text-xs xl:text-sm 2xl:text-base transition-colors ${
-                    panelItems.some((item) => isActive(item.path)) || isActive(settingsPath)
-                      ? "text-orange-600"
-                      : "text-gray-700 hover:text-orange-600"
+              {panelItems.length > 0 && (
+                <div className="relative" ref={panelsRef}>
+                  <button
+                    type="button"
+                    onClick={() => setPanelsOpen((open) => !open)}
+                    aria-expanded={panelsOpen}
+                    aria-haspopup="true"
+                    className={`flex items-center gap-1 font-semibold text-xs xl:text-sm 2xl:text-base transition-colors ${
+                      panelItems.some((item) => isActive(item.path))
+                        ? "text-orange-600"
+                        : "text-gray-700 hover:text-orange-600"
+                    }`}
+                  >
+                    Painéis
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${panelsOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+
+                  {panelsOpen && (
+                    <div className="absolute right-0 mt-3 w-60 rounded-xl border border-gray-100 bg-white py-2 shadow-xl">
+                      {panelItems.map((item) => (
+                        <Link
+                          key={item.path}
+                          to={item.path}
+                          onClick={() => setPanelsOpen(false)}
+                          className={`block px-4 py-2.5 text-sm font-semibold transition-colors ${
+                            isActive(item.path)
+                              ? "text-orange-600 bg-orange-50"
+                              : "text-gray-700 hover:text-orange-600 hover:bg-gray-50"
+                          }`}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {isAuthenticated ? (
+                <div className="flex items-center gap-3 pl-1">
+                  <span className="hidden xl:flex items-center gap-1.5 text-xs text-gray-500 font-semibold">
+                    <UserCircle className="w-4 h-4" />
+                    {user?.name}
+                  </span>
+                  <Link
+                    to={settingsPath}
+                    aria-label="Configurações"
+                    title="Configurações"
+                    className={`transition-colors ${
+                      isActive(settingsPath) ? "text-orange-600" : "text-gray-700 hover:text-orange-600"
+                    }`}
+                  >
+                    <SettingsIcon className="w-4 h-4 xl:w-5 xl:h-5" />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex items-center gap-1.5 font-semibold text-xs xl:text-sm text-gray-700 hover:text-orange-600 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sair
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  className={`font-semibold text-xs xl:text-sm 2xl:text-base transition-colors ${
+                    isActive("/login") ? "text-orange-600" : "text-gray-700 hover:text-orange-600"
                   }`}
                 >
-                  Painéis
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform ${panelsOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
-
-                {panelsOpen && (
-                  <div className="absolute right-0 mt-3 w-60 rounded-xl border border-gray-100 bg-white py-2 shadow-xl">
-                    {panelItems.map((item) => (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        onClick={() => setPanelsOpen(false)}
-                        className={`block px-4 py-2.5 text-sm font-semibold transition-colors ${
-                          isActive(item.path)
-                            ? "text-orange-600 bg-orange-50"
-                            : "text-gray-700 hover:text-orange-600 hover:bg-gray-50"
-                        }`}
-                      >
-                        {item.label}
-                      </Link>
-                    ))}
-                    <div className={panelItems.length > 0 ? "mt-2 border-t border-gray-100 pt-2" : ""}>
-                      <Link
-                        to={settingsPath}
-                        onClick={() => setPanelsOpen(false)}
-                        className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold transition-colors ${
-                          isActive(settingsPath)
-                            ? "text-orange-600 bg-orange-50"
-                            : "text-gray-700 hover:text-orange-600 hover:bg-gray-50"
-                        }`}
-                      >
-                        <SettingsIcon className="w-4 h-4" />
-                        Configurações
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
+                  Entrar
+                </Link>
+              )}
 
               <Link
                 to="/cotacao"
@@ -204,6 +239,27 @@ export function Header() {
                   {item.label}
                 </Link>
               ))}
+              <div className="border-t mt-2 pt-2">
+                {isAuthenticated ? (
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2 py-3 px-4 font-semibold text-gray-700 hover:text-orange-600 hover:bg-gray-50 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sair ({user?.name})
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block py-3 px-4 font-semibold text-gray-700 hover:text-orange-600 hover:bg-gray-50 transition-colors"
+                  >
+                    Entrar
+                  </Link>
+                )}
+              </div>
+
               <Link
                 to="/cotacao"
                 onClick={() => setMobileMenuOpen(false)}
