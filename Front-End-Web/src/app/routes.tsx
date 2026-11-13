@@ -1,67 +1,114 @@
+import { type ComponentType } from "react";
 import { createBrowserRouter } from "react-router";
 import { Root } from "./pages/Root";
-import { Home } from "./pages/Home";
-import { Services } from "./pages/Services";
-import { ServiceDetail } from "./pages/ServiceDetail";
-import { Tracking } from "./pages/Tracking";
-import { Contact } from "./pages/Contact";
-import { About } from "./pages/About";
-import { Blog } from "./pages/Blog";
-import { Careers } from "./pages/Careers";
-import { Clients } from "./pages/Clients";
-import { Coverage } from "./pages/Coverage";
-import { FAQ } from "./pages/FAQ";
-import { Quote } from "./pages/Quote";
-import { CargoRegistration } from "./pages/CargoRegistration";
-import { BulkUpload } from "./pages/BulkUpload";
-import { OperationalMap } from "./pages/OperationalMap";
-import { DocumentAdmin } from "./pages/DocumentAdmin";
-import { EsgDashboard } from "./pages/EsgDashboard";
-import { FreightSavings } from "./pages/FreightSavings";
-import { FleetPerformance } from "./pages/FleetPerformance";
-import { UserManagement } from "./pages/UserManagement";
+import { LoadingScreen } from "./components/LoadingScreen";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
-import { Login } from "./pages/Login";
-import { Register } from "./pages/Register";
-import { Technology } from "./pages/Technology";
-import { Units } from "./pages/Units";
-import { PrivacyPolicy, TermsOfUse } from "./pages/Legal";
-import { NotFound } from "./pages/NotFound";
-import { Settings } from "./pages/Settings";
+import { type Role } from "./auth/AuthContext";
+
+/**
+ * Cada pagina vira um chunk proprio, carregado pelo `lazy` do React Router.
+ *
+ * Diferente de React.lazy + Suspense, o router nao desmonta a pagina atual ao
+ * iniciar a navegacao: ela fica na tela enquanto o chunk da proxima baixa e a
+ * troca acontece de uma vez. Nada esvazia nem salta no meio do caminho, e o
+ * unico feedback e a <RouteProgress />, que aparece so em carga demorada.
+ */
+function page<K extends string>(load: () => Promise<Record<K, ComponentType>>, name: K) {
+  return async () => ({ Component: (await load())[name] });
+}
+
+/** Igual ao `page`, mas exige sessao e, quando informado, um dos perfis. */
+function protectedPage<K extends string>(
+  load: () => Promise<Record<K, ComponentType>>,
+  name: K,
+  roles?: Role[],
+) {
+  return async () => {
+    const Page: ComponentType = (await load())[name];
+
+    return {
+      Component: () => (
+        <ProtectedRoute roles={roles}>
+          <Page />
+        </ProtectedRoute>
+      ),
+    };
+  };
+}
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
+    // Primeira carga do app: o chunk da rota inicial ainda esta vindo.
+    hydrateFallbackElement: <LoadingScreen />,
     children: [
-      { index: true, element: <Home /> },
-      { path: "sobre", element: <About /> },
-      { path: "servicos", element: <Services /> },
-      { path: "servicos/:slug", element: <ServiceDetail /> },
-      { path: "rastreamento", element: <Tracking /> },
-      { path: "cobertura", element: <Coverage /> },
-      { path: "tecnologia", element: <Technology /> },
-      { path: "clientes", element: <Clients /> },
-      { path: "faq", element: <FAQ /> },
-      { path: "cotacao", element: <Quote /> },
-      { path: "login", element: <Login /> },
-      { path: "cadastro", element: <Register /> },
-      { path: "cadastro-cargas", element: <ProtectedRoute><CargoRegistration /></ProtectedRoute> },
-      { path: "gestao-lotes", element: <ProtectedRoute><BulkUpload /></ProtectedRoute> },
-      { path: "mapa-operacional", element: <ProtectedRoute><OperationalMap /></ProtectedRoute> },
-      { path: "painel-esg", element: <ProtectedRoute><EsgDashboard /></ProtectedRoute> },
-      { path: "economia-frete", element: <ProtectedRoute><FreightSavings /></ProtectedRoute> },
-      { path: "performance", element: <ProtectedRoute><FleetPerformance /></ProtectedRoute> },
-      { path: "admin-documentos", element: <ProtectedRoute><DocumentAdmin /></ProtectedRoute> },
-      { path: "admin-usuarios", element: <ProtectedRoute><UserManagement /></ProtectedRoute> },
-      { path: "configuracoes", element: <ProtectedRoute><Settings /></ProtectedRoute> },
-      { path: "trabalhe-conosco", element: <Careers /> },
-      { path: "blog", element: <Blog /> },
-      { path: "unidades", element: <Units /> },
-      { path: "contato", element: <Contact /> },
-      { path: "politica-de-privacidade", element: <PrivacyPolicy /> },
-      { path: "termos-de-uso", element: <TermsOfUse /> },
-      { path: "*", element: <NotFound /> },
+      { index: true, lazy: page(() => import("./pages/Home"), "Home") },
+      { path: "sobre", lazy: page(() => import("./pages/About"), "About") },
+      { path: "servicos", lazy: page(() => import("./pages/Services"), "Services") },
+      { path: "servicos/:slug", lazy: page(() => import("./pages/ServiceDetail"), "ServiceDetail") },
+      { path: "rastreamento", lazy: page(() => import("./pages/Tracking"), "Tracking") },
+      { path: "cobertura", lazy: page(() => import("./pages/Coverage"), "Coverage") },
+      { path: "tecnologia", lazy: page(() => import("./pages/Technology"), "Technology") },
+      { path: "clientes", lazy: page(() => import("./pages/Clients"), "Clients") },
+      { path: "faq", lazy: page(() => import("./pages/FAQ"), "FAQ") },
+      { path: "login", lazy: page(() => import("./pages/Login"), "Login") },
+      { path: "cadastro", lazy: page(() => import("./pages/Register"), "Register") },
+      { path: "trabalhe-conosco", lazy: page(() => import("./pages/Careers"), "Careers") },
+      { path: "blog", lazy: page(() => import("./pages/Blog"), "Blog") },
+      { path: "unidades", lazy: page(() => import("./pages/Units"), "Units") },
+      { path: "contato", lazy: page(() => import("./pages/Contact"), "Contact") },
+      { path: "politica-de-privacidade", lazy: page(() => import("./pages/Legal"), "PrivacyPolicy") },
+      { path: "termos-de-uso", lazy: page(() => import("./pages/Legal"), "TermsOfUse") },
+
+      { path: "cotacao", lazy: protectedPage(() => import("./pages/Quote"), "Quote") },
+      {
+        path: "cadastro-cargas",
+        lazy: protectedPage(() => import("./pages/CargoRegistration"), "CargoRegistration", ["admin", "empresa"]),
+      },
+      {
+        path: "gestao-lotes",
+        lazy: protectedPage(() => import("./pages/BulkUpload"), "BulkUpload", ["admin", "empresa"]),
+      },
+      {
+        path: "mapa-operacional",
+        lazy: protectedPage(() => import("./pages/OperationalMap"), "OperationalMap"),
+      },
+      {
+        path: "painel-esg",
+        lazy: protectedPage(() => import("./pages/EsgDashboard"), "EsgDashboard", ["admin", "empresa"]),
+      },
+      {
+        path: "economia-frete",
+        lazy: protectedPage(() => import("./pages/FreightSavings"), "FreightSavings", ["admin", "empresa"]),
+      },
+      {
+        path: "performance",
+        lazy: protectedPage(() => import("./pages/FleetPerformance"), "FleetPerformance", ["admin", "empresa"]),
+      },
+      {
+        path: "assinatura",
+        lazy: protectedPage(() => import("./pages/SubscriptionCheckout"), "SubscriptionCheckout", ["empresa"]),
+      },
+      {
+        path: "planos",
+        lazy: protectedPage(() => import("./pages/PlanManagement"), "PlanManagement", ["empresa"]),
+      },
+      {
+        path: "chaves-api",
+        lazy: protectedPage(() => import("./pages/ApiKeys"), "ApiKeys", ["empresa"]),
+      },
+      {
+        path: "admin-documentos",
+        lazy: protectedPage(() => import("./pages/DocumentAdmin"), "DocumentAdmin", ["admin"]),
+      },
+      {
+        path: "admin-usuarios",
+        lazy: protectedPage(() => import("./pages/UserManagement"), "UserManagement", ["admin"]),
+      },
+      { path: "configuracoes", lazy: protectedPage(() => import("./pages/Settings"), "Settings") },
+
+      { path: "*", lazy: page(() => import("./pages/NotFound"), "NotFound") },
     ],
   },
 ]);
