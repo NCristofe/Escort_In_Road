@@ -1,6 +1,8 @@
 import { Link, useLocation } from "react-router";
-import { Truck, Menu, X, Phone, ChevronDown } from "lucide-react";
+import { Truck, Menu, X, Phone, ChevronDown, Settings as SettingsIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { panelItems as allPanelItems, settingsPath } from "../data/panels";
+import { useSettings } from "../settings/SettingsContext";
 
 export function Header() {
   const location = useLocation();
@@ -18,20 +20,13 @@ export function Header() {
   ];
 
   /** Painéis internos: agrupados para o menu não estourar a largura do header. */
-  const panelItems = [
-    { path: "/cadastro-cargas", label: "Cadastro de cargas" },
-    { path: "/gestao-lotes", label: "Gestão de lotes" },
-    { path: "/mapa-operacional", label: "Mapa operacional" },
-    { path: "/painel-esg", label: "Painel ESG" },
-    { path: "/economia-frete", label: "Economia de frete" },
-    { path: "/performance", label: "Performance" },
-    { path: "/admin-documentos", label: "Documentos" },
-    { path: "/admin-usuarios", label: "Usuários" },
-  ];
+  const { settings } = useSettings();
+  const panelItems = allPanelItems.filter((item) => !settings.hiddenPanels.includes(item.path));
 
   const mobileNavItems = [
     ...navItems,
     ...panelItems,
+    { path: settingsPath, label: "Configurações" },
     { path: "/tecnologia", label: "Tecnologia" },
     { path: "/clientes", label: "Clientes" },
     { path: "/faq", label: "FAQ" },
@@ -125,7 +120,7 @@ export function Header() {
                   aria-expanded={panelsOpen}
                   aria-haspopup="true"
                   className={`flex items-center gap-1 font-semibold text-xs xl:text-sm 2xl:text-base transition-colors ${
-                    panelItems.some((item) => isActive(item.path))
+                    panelItems.some((item) => isActive(item.path)) || isActive(settingsPath)
                       ? "text-orange-600"
                       : "text-gray-700 hover:text-orange-600"
                   }`}
@@ -152,6 +147,20 @@ export function Header() {
                         {item.label}
                       </Link>
                     ))}
+                    <div className={panelItems.length > 0 ? "mt-2 border-t border-gray-100 pt-2" : ""}>
+                      <Link
+                        to={settingsPath}
+                        onClick={() => setPanelsOpen(false)}
+                        className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold transition-colors ${
+                          isActive(settingsPath)
+                            ? "text-orange-600 bg-orange-50"
+                            : "text-gray-700 hover:text-orange-600 hover:bg-gray-50"
+                        }`}
+                      >
+                        <SettingsIcon className="w-4 h-4" />
+                        Configurações
+                      </Link>
+                    </div>
                   </div>
                 )}
               </div>
