@@ -17,8 +17,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { PageHero } from "../components/PageHero";
-import { useAuth } from "../auth/AuthContext";
-import { panelItems, type PanelPath } from "../data/panels";
+import { useAuth, type Role } from "../auth/AuthContext";
+import { defaultHomeByRole, panelItems, panelsForRole, type PanelPath } from "../data/panels";
 import {
   fontScalePx,
   useSettings,
@@ -57,6 +57,12 @@ const fontScaleLabels: Record<FontScale, string> = {
   normal: "Padrão",
   large: "Grande",
   xlarge: "Muito grande",
+};
+
+const roleLabels: Record<Role, string> = {
+  admin: "Administrador",
+  empresa: "Empresa",
+  motorista: "Motorista",
 };
 
 const inputClass =
@@ -205,7 +211,6 @@ function ProfileSection({ onSaved }: { onSaved: (message: string) => void }) {
   const { user, updateProfile } = useAuth();
   const [form, setForm] = useState({
     name: user?.name ?? "",
-    email: user?.email ?? "",
     phone: user?.phone ?? "",
     company: user?.company ?? "",
     jobTitle: user?.jobTitle ?? "",
@@ -218,7 +223,7 @@ function ProfileSection({ onSaved }: { onSaved: (message: string) => void }) {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!updateProfile(form)) {
-      setError("Nome e e-mail são obrigatórios.");
+      setError("O nome é obrigatório.");
       return;
     }
     setError("");
@@ -240,7 +245,7 @@ function ProfileSection({ onSaved }: { onSaved: (message: string) => void }) {
         </div>
         <div>
           <div className="font-bold text-gray-900 text-lg">{form.name || "Sem nome"}</div>
-          <div className="text-sm text-gray-600">Administrador</div>
+          <div className="text-sm text-gray-600">{user ? roleLabels[user.role] : ""}</div>
         </div>
       </div>
 
@@ -248,13 +253,12 @@ function ProfileSection({ onSaved }: { onSaved: (message: string) => void }) {
         <Field label="Nome completo">
           <input required value={form.name} onChange={(e) => setField("name")(e.target.value)} className={inputClass} />
         </Field>
-        <Field label="E-mail">
+        <Field label="E-mail" hint="O e-mail é o seu login e não pode ser alterado por aqui.">
           <input
-            required
             type="email"
-            value={form.email}
-            onChange={(e) => setField("email")(e.target.value)}
-            className={inputClass}
+            value={user?.email ?? ""}
+            readOnly
+            className={`${inputClass} bg-gray-50 text-gray-500 cursor-not-allowed`}
           />
         </Field>
         <Field label="Telefone / WhatsApp">
@@ -293,7 +297,7 @@ function ProfileSection({ onSaved }: { onSaved: (message: string) => void }) {
 
 function SecuritySection({ onSaved }: { onSaved: (message: string) => void }) {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, changePassword } = useAuth();
   const [current, setCurrent] = useState("");
   const [next, setNext] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -307,6 +311,10 @@ function SecuritySection({ onSaved }: { onSaved: (message: string) => void }) {
     if (!/[A-Za-z]/.test(next) || !/\d/.test(next)) return setError("Use letras e números na nova senha.");
     if (next === current) return setError("A nova senha precisa ser diferente da atual.");
     if (next !== confirm) return setError("A confirmação não confere com a nova senha.");
+
+    const result = changePassword(current, next);
+    if (result === "wrong-password") return setError("A senha atual está incorreta.");
+    if (result === "demo-account") return setError("A senha das contas de demonstração não pode ser alterada.");
 
     setError("");
     setCurrent("");
@@ -447,8 +455,12 @@ function NotificationsSection() {
 /* ---------- Painéis ---------- */
 
 function PanelsSection() {
+  const { user } = useAuth();
   const { settings, updateSettings } = useSettings();
   const hidden = new Set(settings.hiddenPanels);
+  const available = user ? panelsForRole(user.role) : [];
+  const defaultHome = user ? panelItems.find((item) => item.path === defaultHomeByRole[user.role]) : undefined;
+  const homeValue = settings.homePage && available.some((item) => item.path === settings.homePage) ? settings.homePage : "";
 
   const togglePanel = (path: PanelPath, visible: boolean) => {
     const next = new Set(hidden);
@@ -462,11 +474,12 @@ function PanelsSection() {
       <Card title="Página inicial" description="Para onde você vai depois de fazer login.">
         <Field label="Abrir após o login">
           <select
-            value={settings.homePage}
-            onChange={(e) => updateSettings({ homePage: e.target.value as PanelPath })}
+            value={homeValue}
+            onChange={(e) => updateSettings({ homePage: (e.target.value || null) as PanelPath | null })}
             className={`${inputClass} bg-white`}
           >
-            {panelItems.map((item) => (
+            <option value="">Padrão do perfil{defaultHome ? ` (${defaultHome.label})` : ""}</option>
+            {available.map((item) => (
               <option key={item.path} value={item.path}>
                 {item.label}
               </option>
@@ -480,7 +493,7 @@ function PanelsSection() {
         description="Escolha quais painéis aparecem no menu. Os escondidos continuam acessíveis pelo endereço."
       >
         <div className="divide-y divide-gray-100">
-          {panelItems.map((item) => (
+          {available.map((item) => (
             <ToggleRow
               key={item.path}
               label={item.label}
