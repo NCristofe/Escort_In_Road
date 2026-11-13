@@ -1,26 +1,9 @@
 import { Link, useLocation, useNavigate } from "react-router";
-import { Truck, Menu, X, Phone, ChevronDown, LogOut, UserCircle } from "lucide-react";
+import { Truck, Menu, X, Phone, ChevronDown, LogOut, Settings as SettingsIcon, UserCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useAuth, type Role } from "../auth/AuthContext";
-
-/**
- * Quem pode ver (e acessar) cada painel interno.
- * Mantenha isto em sincronia com os `roles` das rotas em routes.tsx:
- * um item que aparece aqui para um perfil sem permissão na rota leva a
- * pessoa a clicar num link que só a devolve para "/".
- */
-const panelItemsByRole: { path: string; label: string; roles: Role[] }[] = [
-  { path: "/cadastro-cargas", label: "Cadastro de cargas", roles: ["admin", "empresa"] },
-  { path: "/gestao-lotes", label: "Gestão de lotes", roles: ["admin", "empresa"] },
-  { path: "/mapa-operacional", label: "Mapa operacional", roles: ["admin", "empresa", "motorista"] },
-  { path: "/painel-esg", label: "Painel ESG", roles: ["admin", "empresa"] },
-  { path: "/economia-frete", label: "Economia de frete", roles: ["admin", "empresa"] },
-  { path: "/performance", label: "Performance", roles: ["admin", "empresa"] },
-  { path: "/admin-documentos", label: "Documentos", roles: ["admin"] },
-  { path: "/admin-usuarios", label: "Usuários", roles: ["admin"] },
-  { path: "/planos", label: "Planos e faturas", roles: ["empresa"] },
-  { path: "/chaves-api", label: "Chaves de API", roles: ["empresa"] },
-];
+import { useAuth } from "../auth/AuthContext";
+import { panelsForRole, settingsPath } from "../data/panels";
+import { useSettings } from "../settings/SettingsContext";
 
 export function Header() {
   const location = useLocation();
@@ -39,12 +22,16 @@ export function Header() {
     { path: "/contato", label: "Contato" },
   ];
 
-  /** Só os painéis que o perfil logado pode realmente abrir. */
-  const panelItems = user ? panelItemsByRole.filter((item) => item.roles.includes(user.role)) : [];
+  /** Só os painéis que o perfil logado pode abrir, menos os escondidos em Configurações. */
+  const { settings } = useSettings();
+  const panelItems = user
+    ? panelsForRole(user.role).filter((item) => !settings.hiddenPanels.includes(item.path))
+    : [];
 
   const mobileNavItems = [
     ...navItems,
     ...panelItems,
+    ...(isAuthenticated ? [{ path: settingsPath, label: "Configurações" }] : []),
     { path: "/tecnologia", label: "Tecnologia" },
     { path: "/clientes", label: "Clientes" },
     { path: "/faq", label: "FAQ" },
@@ -183,6 +170,16 @@ export function Header() {
                     <UserCircle className="w-4 h-4" />
                     {user?.name}
                   </span>
+                  <Link
+                    to={settingsPath}
+                    aria-label="Configurações"
+                    title="Configurações"
+                    className={`transition-colors ${
+                      isActive(settingsPath) ? "text-orange-600" : "text-gray-700 hover:text-orange-600"
+                    }`}
+                  >
+                    <SettingsIcon className="w-4 h-4 xl:w-5 xl:h-5" />
+                  </Link>
                   <button
                     type="button"
                     onClick={handleLogout}

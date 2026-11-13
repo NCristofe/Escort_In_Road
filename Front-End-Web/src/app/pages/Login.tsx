@@ -2,6 +2,8 @@ import { useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Lock, LogIn, Mail, ShieldCheck } from "lucide-react";
 import { useAuth, type Role } from "../auth/AuthContext";
+import { resolveHomePage } from "../data/panels";
+import { useSettings } from "../settings/SettingsContext";
 
 type LocationState = {
   from?: string;
@@ -13,16 +15,11 @@ const demoAccounts: { role: Role; label: string; email: string; password: string
   { role: "motorista", label: "Motorista", email: "motorista@escortinroad.com.br", password: "motorista123" },
 ];
 
-const homeByRole: Record<Role, string> = {
-  admin: "/admin-usuarios",
-  empresa: "/cadastro-cargas",
-  motorista: "/mapa-operacional",
-};
-
 export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const { settings } = useSettings();
   const [email, setEmail] = useState("admin@escortinroad.com.br");
   const [password, setPassword] = useState("admin123");
   const [error, setError] = useState("");
@@ -31,17 +28,15 @@ export function Login() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const success = login(email, password);
+    const loggedUser = login(email, password);
 
-    if (!success) {
+    if (!loggedUser) {
       setError("E-mail ou senha invalidos. Use uma das contas de demonstracao ou crie um cadastro.");
       return;
     }
 
     setError("");
-    navigate(from ?? homeByRole[demoAccounts.find((account) => account.email === email)?.role ?? "empresa"], {
-      replace: true,
-    });
+    navigate(from ?? resolveHomePage(loggedUser.role, settings.homePage), { replace: true });
   };
 
   return (

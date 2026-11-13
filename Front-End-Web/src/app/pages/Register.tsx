@@ -2,16 +2,13 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { Building2, Lock, Mail, Truck, UserPlus } from "lucide-react";
 import { useAuth, type Role } from "../auth/AuthContext";
+import { defaultHomeByRole } from "../data/panels";
 
 const accountTypes: { role: Extract<Role, "empresa" | "motorista">; label: string; description: string; icon: typeof Building2 }[] = [
   { role: "empresa", label: "Empresa", description: "Cadastra cargas e importa lotes.", icon: Building2 },
   { role: "motorista", label: "Motorista", description: "Consulta o mapa operacional.", icon: Truck },
 ];
 
-const homeByRole: Record<Extract<Role, "empresa" | "motorista">, string> = {
-  empresa: "/cadastro-cargas",
-  motorista: "/mapa-operacional",
-};
 
 export function Register() {
   const navigate = useNavigate();
@@ -32,7 +29,7 @@ export function Register() {
     }
 
     setError("");
-    navigate(homeByRole[role], { replace: true });
+    navigate(defaultHomeByRole[role], { replace: true });
   };
 
   return (
