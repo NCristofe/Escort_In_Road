@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Lock, LogIn, Mail, ShieldCheck } from "lucide-react";
 import { useAuth } from "../auth/AuthContext";
+import { useSettings } from "../settings/SettingsContext";
 
 type LocationState = {
   from?: string;
@@ -15,7 +16,8 @@ export function Login() {
   const [password, setPassword] = useState("admin123");
   const [error, setError] = useState("");
 
-  const from = (location.state as LocationState | null)?.from ?? "/admin-usuarios";
+  const { settings } = useSettings();
+  const from = (location.state as LocationState | null)?.from ?? settings.homePage;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
