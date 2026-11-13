@@ -1,16 +1,22 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
-type AuthUser = {
+export type AuthUser = {
   name: string;
   email: string;
   role: "admin";
+  phone?: string;
+  company?: string;
+  jobTitle?: string;
 };
+
+export type ProfileChanges = Partial<Pick<AuthUser, "name" | "email" | "phone" | "company" | "jobTitle">>;
 
 type AuthContextValue = {
   user: AuthUser | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => boolean;
   register: (name: string, email: string, password: string) => boolean;
+  updateProfile: (changes: ProfileChanges) => boolean;
   logout: () => void;
 };
 
@@ -53,6 +59,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           name: name.trim(),
           email: email.trim(),
           role: "admin",
+        };
+
+        localStorage.setItem(storageKey, JSON.stringify(nextUser));
+        setUser(nextUser);
+        return true;
+      },
+      updateProfile: (changes: ProfileChanges) => {
+        if (!user) return false;
+        if (changes.name !== undefined && !changes.name.trim()) return false;
+        if (changes.email !== undefined && !changes.email.trim()) return false;
+
+        const nextUser: AuthUser = {
+          ...user,
+          ...Object.fromEntries(
+            Object.entries(changes).map(([key, value]) => [key, typeof value === "string" ? value.trim() : value]),
+          ),
         };
 
         localStorage.setItem(storageKey, JSON.stringify(nextUser));
