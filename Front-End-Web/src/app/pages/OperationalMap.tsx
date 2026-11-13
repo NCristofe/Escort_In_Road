@@ -1,14 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import L, { type LatLngExpression, type Map as LeafletMap, type Marker } from "leaflet";
+import { renderToStaticMarkup } from "react-dom/server";
+import L, {
+  type LatLngExpression,
+  type LayerGroup,
+  type Map as LeafletMap,
+  type Marker,
+} from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
   AlertTriangle,
+  Coffee,
   Filter,
+  Fuel,
   MapPin,
   Package,
   RefreshCw,
   Route,
   Truck,
+  Wrench,
 } from "lucide-react";
 import { PageHero } from "../components/PageHero";
 
@@ -168,6 +177,142 @@ const filters = [
   { id: "load", label: "Cargas pendentes" },
 ] as const;
 
+type PoiCategory = "parada" | "posto" | "oficina";
+
+type PointOfInterest = {
+  id: string;
+  category: PoiCategory;
+  name: string;
+  location: string;
+  /** Referencia de quilometragem no corredor, como aparece na sinalizacao da via. */
+  km: string;
+  lat: number;
+  lng: number;
+  hours: string;
+  /** Convenio ativo com a ESCORTinRoad (tarifa negociada, atendimento prioritario). */
+  partner: boolean;
+  services: string[];
+};
+
+const poiCategories: Record<PoiCategory, { label: string; short: string; color: string; icon: typeof Coffee }> = {
+  parada: { label: "Parada parceira", short: "Parada", color: "#059669", icon: Coffee },
+  posto: { label: "Posto de combustivel", short: "Posto", color: "#7c3aed", icon: Fuel },
+  oficina: { label: "Oficina", short: "Oficina", color: "#0891b2", icon: Wrench },
+};
+
+const poiCategoryList = ["parada", "posto", "oficina"] as const;
+
+const pointsOfInterest: PointOfInterest[] = [
+  {
+    id: "POI-101",
+    category: "posto",
+    name: "Posto Regis Bittencourt",
+    location: "Embu das Artes/SP",
+    km: "BR-116 km 279",
+    lat: -23.6612,
+    lng: -46.873,
+    hours: "24 horas",
+    partner: true,
+    services: ["Diesel S10", "Arla 32", "Balanca", "Estacionamento vigiado"],
+  },
+  {
+    id: "POI-108",
+    category: "parada",
+    name: "Parada Serra do Cafezal",
+    location: "Sao Lourenco da Serra/SP",
+    km: "BR-116 km 297",
+    lat: -23.8467,
+    lng: -46.9436,
+    hours: "05h as 23h",
+    partner: true,
+    services: ["Restaurante", "Banho quente", "Wi-Fi", "Area de descanso"],
+  },
+  {
+    id: "POI-114",
+    category: "oficina",
+    name: "Oficina Juquitiba Diesel",
+    location: "Juquitiba/SP",
+    km: "BR-116 km 312",
+    lat: -23.9319,
+    lng: -47.0686,
+    hours: "07h as 19h",
+    partner: false,
+    services: ["Mecanica pesada", "Borracharia", "Eletrica 24h", "Socorro na via"],
+  },
+  {
+    id: "POI-121",
+    category: "posto",
+    name: "Posto Miracatu Sul",
+    location: "Miracatu/SP",
+    km: "BR-116 km 355",
+    lat: -24.2789,
+    lng: -47.4586,
+    hours: "24 horas",
+    partner: true,
+    services: ["Diesel S10", "Arla 32", "Troca de oleo", "Conveniencia"],
+  },
+  {
+    id: "POI-130",
+    category: "parada",
+    name: "Parada Vale do Ribeira",
+    location: "Registro/SP",
+    km: "BR-116 km 400",
+    lat: -24.4879,
+    lng: -47.8449,
+    hours: "24 horas",
+    partner: true,
+    services: ["Restaurante", "Dormitorio", "Patio para 80 carretas", "Monitoramento 24h"],
+  },
+  {
+    id: "POI-137",
+    category: "oficina",
+    name: "Oficina Jacupiranga Truck",
+    location: "Jacupiranga/SP",
+    km: "BR-116 km 440",
+    lat: -24.6947,
+    lng: -48.0044,
+    hours: "08h as 18h",
+    partner: true,
+    services: ["Suspensao", "Freios", "Borracharia", "Guincho parceiro"],
+  },
+  {
+    id: "POI-145",
+    category: "posto",
+    name: "Posto Barra do Turvo",
+    location: "Barra do Turvo/SP",
+    km: "BR-116 km 490",
+    lat: -24.7592,
+    lng: -48.5028,
+    hours: "24 horas",
+    partner: false,
+    services: ["Diesel comum", "Arla 32", "Lanchonete"],
+  },
+  {
+    id: "POI-152",
+    category: "parada",
+    name: "Parada Campina Grande",
+    location: "Campina Grande do Sul/PR",
+    km: "BR-116 km 40 (PR)",
+    lat: -25.3055,
+    lng: -49.0553,
+    hours: "24 horas",
+    partner: true,
+    services: ["Restaurante", "Banho quente", "Patio vigiado", "Apoio a escolta"],
+  },
+  {
+    id: "POI-160",
+    category: "oficina",
+    name: "Oficina Contorno Leste",
+    location: "Curitiba/PR",
+    km: "BR-116 km 84 (PR)",
+    lat: -25.4809,
+    lng: -49.1867,
+    hours: "07h as 20h",
+    partner: true,
+    services: ["Mecanica pesada", "Diagnostico eletronico", "Ar-condicionado", "Pneus"],
+  },
+];
+
 function priorityClass(priority: MapItem["priority"]) {
   if (priority === "critica") return "bg-red-50 text-red-700";
   if (priority === "alta") return "bg-amber-50 text-amber-700";
@@ -210,22 +355,79 @@ function popupContent(item: MapItem) {
   `;
 }
 
+function buildPoiIcon(poi: PointOfInterest) {
+  const { color, icon: Icon } = poiCategories[poi.category];
+  const size = 30;
+  const glyph = renderToStaticMarkup(<Icon width={15} height={15} color="#fff" strokeWidth={2.6} />);
+
+  return L.divIcon({
+    className: "",
+    html: `<div style="
+      width:${size}px;
+      height:${size}px;
+      border-radius:9px;
+      background:${color};
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:2px solid #fff;
+      box-shadow:0 6px 14px rgba(17, 24, 39, 0.26);
+    ">${glyph}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+    popupAnchor: [0, -size / 2],
+  });
+}
+
+function poiPopupContent(poi: PointOfInterest) {
+  const category = poiCategories[poi.category];
+  const badge = poi.partner
+    ? '<span style="background:#ecfdf5;color:#047857;font-weight:700;font-size:10px;padding:1px 6px;border-radius:999px;">PARCEIRA</span>'
+    : "";
+
+  return `
+    <strong>${poi.name}</strong> ${badge}<br />
+    <span style="color:${category.color};font-weight:700;">${category.label}</span><br />
+    ${poi.location} &middot; ${poi.km}<br />
+    <span>Funcionamento: ${poi.hours}</span><br />
+    <span>${poi.services.join(", ")}</span>
+  `;
+}
+
 export function OperationalMap() {
   const mapElementRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const markerRefs = useRef<Marker[]>([]);
+  const poiLayerRef = useRef<LayerGroup | null>(null);
+  const poiMarkerRefs = useRef<Record<string, Marker>>({});
   const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]["id"]>("all");
   const [selectedId, setSelectedId] = useState(mapItems[0].id);
+  const [showPois, setShowPois] = useState(true);
+  const [poiFilter, setPoiFilter] = useState<PoiCategory | "all">("all");
 
   const visibleItems = useMemo(() => {
     if (activeFilter === "all") return mapItems;
     return mapItems.filter((item) => item.type === activeFilter);
   }, [activeFilter]);
 
+  const visiblePois = useMemo(() => {
+    if (poiFilter === "all") return pointsOfInterest;
+    return pointsOfInterest.filter((poi) => poi.category === poiFilter);
+  }, [poiFilter]);
+
   const selectedItem = visibleItems.find((item) => item.id === selectedId) ?? visibleItems[0] ?? mapItems[0];
   const emptyTrucks = mapItems.filter((item) => item.type === "truck").length;
   const pendingLoads = mapItems.filter((item) => item.type === "load").length;
   const criticalLoads = mapItems.filter((item) => item.type === "load" && item.priority === "critica").length;
+  const partnerPois = pointsOfInterest.filter((poi) => poi.partner).length;
+
+  function focusPoi(poi: PointOfInterest) {
+    setShowPois(true);
+    const map = mapRef.current;
+    if (!map) return;
+    map.flyTo([poi.lat, poi.lng], Math.max(map.getZoom(), 9), { duration: 0.7 });
+    window.setTimeout(() => poiMarkerRefs.current[poi.id]?.openPopup(), 750);
+  }
 
   useEffect(() => {
     if (!visibleItems.some((item) => item.id === selectedId)) {
@@ -291,6 +493,36 @@ export function OperationalMap() {
 
   useEffect(() => {
     const map = mapRef.current;
+    if (!map) return;
+
+    poiMarkerRefs.current = {};
+    if (!showPois) {
+      poiLayerRef.current = null;
+      return;
+    }
+
+    const layer = L.layerGroup();
+    visiblePois.forEach((poi) => {
+      const marker = L.marker([poi.lat, poi.lng], {
+        icon: buildPoiIcon(poi),
+        title: `${poi.name} - ${poi.km}`,
+      }).bindPopup(poiPopupContent(poi));
+
+      marker.addTo(layer);
+      poiMarkerRefs.current[poi.id] = marker;
+    });
+
+    layer.addTo(map);
+    poiLayerRef.current = layer;
+
+    return () => {
+      layer.remove();
+      poiLayerRef.current = null;
+    };
+  }, [showPois, visiblePois]);
+
+  useEffect(() => {
+    const map = mapRef.current;
     if (!map || !selectedItem) return;
     map.flyTo([selectedItem.lat, selectedItem.lng], Math.max(map.getZoom(), 6), { duration: 0.7 });
   }, [selectedItem]);
@@ -300,16 +532,17 @@ export function OperationalMap() {
       <PageHero
         eyebrow="Visualizacao Geografica"
         title="Mapa operacional Sao Paulo -> Curitiba"
-        description="Veja caminhoes vazios e cargas pendentes no corredor SP-PR para reduzir ociosidade e acelerar alocacoes."
+        description="Veja caminhoes vazios, cargas pendentes e pontos de apoio no corredor SP-PR para reduzir ociosidade e acelerar alocacoes."
       />
 
       <section className="py-12 lg:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-3 gap-5 mb-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
             {[
               { icon: Truck, value: emptyTrucks, label: "caminhoes vazios", color: "text-blue-700", bg: "bg-blue-50" },
               { icon: Package, value: pendingLoads, label: "cargas pendentes", color: "text-orange-700", bg: "bg-orange-50" },
               { icon: AlertTriangle, value: criticalLoads, label: "prioridades criticas", color: "text-red-700", bg: "bg-red-50" },
+              { icon: Coffee, value: partnerPois, label: "pontos parceiros", color: "text-emerald-700", bg: "bg-emerald-50" },
             ].map((metric) => (
               <div key={metric.label} className="bg-white rounded-xl shadow-md p-5 flex items-center gap-4">
                 <div className={`${metric.bg} p-3 rounded-lg`}>
@@ -345,6 +578,17 @@ export function OperationalMap() {
                       {filter.label}
                     </button>
                   ))}
+                  <button
+                    type="button"
+                    onClick={() => setShowPois((current) => !current)}
+                    aria-pressed={showPois}
+                    className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors inline-flex items-center gap-2 ${
+                      showPois ? "bg-emerald-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    <MapPin className="w-4 h-4" />
+                    Pontos de apoio
+                  </button>
                 </div>
               </div>
 
@@ -352,7 +596,7 @@ export function OperationalMap() {
                 <div
                   ref={mapElementRef}
                   className="relative z-0 h-[420px] sm:h-[560px] rounded-xl overflow-hidden border border-gray-200 bg-gray-100"
-                  aria-label="Mapa real do corredor Sao Paulo Curitiba com caminhoes vazios e cargas pendentes"
+                  aria-label="Mapa real do corredor Sao Paulo Curitiba com caminhoes vazios, cargas pendentes e pontos de apoio"
                 />
                 <div className="flex flex-wrap gap-3 mt-4 text-sm text-gray-600">
                   <span className="inline-flex items-center gap-2">
@@ -363,6 +607,16 @@ export function OperationalMap() {
                     <span className="w-3 h-3 rounded-full bg-orange-600" />
                     Carga pendente
                   </span>
+                  {showPois &&
+                    poiCategoryList.map((category) => (
+                      <span key={category} className="inline-flex items-center gap-2">
+                        <span
+                          className="w-3 h-3 rounded-[4px]"
+                          style={{ backgroundColor: poiCategories[category].color }}
+                        />
+                        {poiCategories[category].label}
+                      </span>
+                    ))}
                 </div>
               </div>
             </div>
@@ -428,6 +682,77 @@ export function OperationalMap() {
                       <div className="text-sm text-gray-600">{item.location}</div>
                     </button>
                   ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <div className="flex items-center gap-3 mb-1">
+                  <MapPin className="w-5 h-5 text-emerald-600" />
+                  <h3 className="font-bold text-gray-900">Pontos de interesse no trajeto</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Paradas parceiras, postos e oficinas ao longo do corredor SP &rarr; PR.
+                </p>
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {(["all", ...poiCategoryList] as const).map((category) => (
+                    <button
+                      key={category}
+                      type="button"
+                      onClick={() => {
+                        setPoiFilter(category);
+                        setShowPois(true);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg font-bold text-xs transition-colors ${
+                        poiFilter === category
+                          ? "bg-emerald-600 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      {category === "all" ? "Todos" : poiCategories[category].short}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
+                  {visiblePois.map((poi) => {
+                    const category = poiCategories[poi.category];
+                    const Icon = category.icon;
+
+                    return (
+                      <button
+                        key={poi.id}
+                        type="button"
+                        onClick={() => focusPoi(poi)}
+                        className="w-full text-left border border-gray-200 rounded-lg p-3 transition-colors hover:bg-gray-50"
+                      >
+                        <div className="flex items-start gap-3">
+                          <span
+                            className="p-1.5 rounded-md shrink-0"
+                            style={{ backgroundColor: `${category.color}1a` }}
+                          >
+                            <Icon className="w-4 h-4" style={{ color: category.color }} />
+                          </span>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-bold text-gray-900">{poi.name}</span>
+                              {poi.partner && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
+                                  PARCEIRA
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              {poi.location} &middot; {poi.km}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {poi.hours} &middot; {poi.services.join(", ")}
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </aside>
