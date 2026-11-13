@@ -27,6 +27,7 @@ import { Technology } from "./pages/Technology";
 import { Units } from "./pages/Units";
 import { PrivacyPolicy, TermsOfUse } from "./pages/Legal";
 import { NotFound } from "./pages/NotFound";
+import { Settings } from "./pages/Settings";
 
 export const router = createBrowserRouter([
   {
@@ -53,6 +54,7 @@ export const router = createBrowserRouter([
       { path: "performance", element: <ProtectedRoute><FleetPerformance /></ProtectedRoute> },
       { path: "admin-documentos", element: <ProtectedRoute><DocumentAdmin /></ProtectedRoute> },
       { path: "admin-usuarios", element: <ProtectedRoute><UserManagement /></ProtectedRoute> },
+      { path: "configuracoes", element: <ProtectedRoute><Settings /></ProtectedRoute> },
       { path: "trabalhe-conosco", element: <Careers /> },
       { path: "blog", element: <Blog /> },
       { path: "unidades", element: <Units /> },
