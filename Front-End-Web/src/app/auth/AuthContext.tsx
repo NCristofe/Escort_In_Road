@@ -3,13 +3,22 @@ import { loadFromStorage, saveToStorage } from "../lib/storage";
 
 export type Role = "admin" | "empresa" | "motorista";
 
-export type AuthUser = {
+/** Dados de perfil editáveis em Configurações > Perfil. */
+export type ProfileDetails = {
   name: string;
+  phone?: string;
+  company?: string;
+  jobTitle?: string;
+};
+
+export type AuthUser = ProfileDetails & {
   email: string;
   role: Role;
 };
 
-type StoredAccount = AuthUser & { password: string };
+export type ProfileChanges = Partial<ProfileDetails>;
+
+type StoredAccount = { name: string; email: string; role: Role; password: string };
 
 /** Falha de operacao da conta, com texto pronto para a tela. */
 export type AccountError = { message: string };
@@ -26,6 +35,8 @@ type AuthContextValue = {
     role: Extract<Role, "empresa" | "motorista">,
   ) => AuthUser | null;
   logout: () => void;
+  /** Atualiza nome e dados complementares (telefone, empresa, cargo). */
+  updateProfile: (changes: ProfileChanges) => boolean;
   /** Null em caso de sucesso; com erro, a mensagem a exibir. */
   updateName: (name: string) => AccountError | null;
   changePassword: (current: string, next: string) => AccountError | null;
@@ -36,6 +47,8 @@ const sessionKey = "escort-auth-user";
 const accountsKey = "escort-auth-accounts";
 /** Marca que as contas de demonstracao ja foram gravadas; sem isto, uma conta apagada voltaria. */
 const seededKey = "escort-auth-seeded";
+/** Dados complementares do perfil (telefone, empresa, cargo), por e-mail. */
+const profilesKey = "escort-auth-profiles";
 
 export const MIN_PASSWORD_LENGTH = 6;
 
@@ -107,6 +120,30 @@ function writeAccount(account: StoredAccount) {
   saveToStorage(accountsKey, accounts);
 }
 
+type ExtraDetails = Omit<ProfileDetails, "name">;
+
+function loadProfiles() {
+  return loadFromStorage<Record<string, ExtraDetails>>(profilesKey, {});
+}
+
+/** O nome vem sempre da conta; o perfil guarda so os dados complementares. */
+function toSessionUser(account: StoredAccount): AuthUser {
+  const extra = loadProfiles()[normalizeEmail(account.email)] ?? {};
+  return {
+    phone: extra.phone,
+    company: extra.company,
+    jobTitle: extra.jobTitle,
+    name: account.name,
+    email: account.email,
+    role: account.role,
+  };
+}
+
+function clean(value: string | undefined) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(() => {
     ensureSeeded();
@@ -116,7 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo<AuthContextValue>(() => {
     /** Guarda a sessao e devolve a conta, sem a senha. */
     function startSession(account: StoredAccount) {
-      const nextUser: AuthUser = { name: account.name, email: account.email, role: account.role };
+      const nextUser = toSessionUser(account);
       saveToStorage(sessionKey, nextUser);
       setUser(nextUser);
       return nextUser;
@@ -151,6 +188,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
       },
 
+      updateProfile: (changes) => {
+        if (!user) return false;
+        if (changes.name !== undefined && !changes.name.trim()) return false;
+
+        const account = findAccount(user.email);
+        if (!account) return false;
+
+        const extra: ExtraDetails = {
+          phone: "phone" in changes ? clean(changes.phone) : user.phone,
+          company: "company" in changes ? clean(changes.company) : user.company,
+          jobTitle: "jobTitle" in changes ? clean(changes.jobTitle) : user.jobTitle,
+        };
+        saveToStorage(profilesKey, { ...loadProfiles(), [normalizeEmail(user.email)]: extra });
+
+        const nextAccount = { ...account, name: clean(changes.name) ?? account.name };
+        writeAccount(nextAccount);
+        startSession(nextAccount);
+        return true;
+      },
+
       updateName: (name) => {
         if (!user) return { message: "Sessão expirada. Entre novamente." };
 
@@ -183,10 +240,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       deleteAccount: () => {
         if (!user) return;
 
-        const remaining = ensureSeeded().filter(
-          (account) => normalizeEmail(account.email) !== normalizeEmail(user.email),
-        );
+        const email = normalizeEmail(user.email);
+        const remaining = ensureSeeded().filter((account) => normalizeEmail(account.email) !== email);
         saveToStorage(accountsKey, remaining);
+
+        const { [email]: _removed, ...otherProfiles } = loadProfiles();
+        saveToStorage(profilesKey, otherProfiles);
+
         localStorage.removeItem(sessionKey);
         setUser(null);
       },

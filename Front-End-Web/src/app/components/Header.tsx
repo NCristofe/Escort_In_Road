@@ -1,8 +1,10 @@
 import { Link, useLocation, useNavigate } from "react-router";
-import { Truck, Menu, X, Phone, ChevronDown, LogOut, UserCircle } from "lucide-react";
+import { Truck, Menu, X, Phone, ChevronDown, LogOut, Settings as SettingsIcon, UserCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../auth/AuthContext";
-import { INLINE_PANEL_LIMIT, homeByRole, panelsForRole } from "../auth/navigation";
+import { INLINE_PANEL_LIMIT, panelsForRole } from "../auth/navigation";
+import { resolveHomePage, settingsPath } from "../data/panels";
+import { useSettings } from "../settings/SettingsContext";
 
 /** Navegacao de quem ainda nao entrou: o site institucional. */
 const publicNavItems = [
@@ -26,6 +28,7 @@ export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user, logout } = useAuth();
+  const { settings } = useSettings();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [morePanelsOpen, setMorePanelsOpen] = useState(false);
@@ -34,14 +37,16 @@ export function Header() {
   const userMenuRef = useRef<HTMLDivElement | null>(null);
 
   /*
-   * Logado, o topo e so a area de trabalho: os paineis que o perfil abre, o
-   * rastreamento (que agora exige sessao) e o menu da conta. As paginas
-   * institucionais continuam acessiveis pelo logo e pelo rodape.
+   * Logado, o topo e so a area de trabalho: os paineis que o perfil abre (menos
+   * os escondidos em Configuracoes), o rastreamento (que exige sessao) e o menu
+   * da conta. As paginas institucionais continuam acessiveis pelo logo e pelo rodape.
    */
-  const panels = user ? panelsForRole(user.role) : [];
+  const panels = user
+    ? panelsForRole(user.role).filter((item) => !settings.hiddenPanels.includes(item.path))
+    : [];
   const inlinePanels = panels.slice(0, INLINE_PANEL_LIMIT);
   const morePanels = panels.slice(INLINE_PANEL_LIMIT);
-  const homePath = user ? homeByRole[user.role] : "/";
+  const homePath = user ? resolveHomePage(user.role, settings.homePage) : "/";
 
   useEffect(() => {
     setMorePanelsOpen(false);
@@ -82,6 +87,13 @@ export function Header() {
       isActive(path) ? "text-orange-600" : "text-gray-700 hover:text-orange-600"
     }`;
 
+  const menuItemClass = (path: string) =>
+    `flex items-center gap-2 px-4 py-2.5 text-sm font-semibold transition-colors ${
+      isActive(path)
+        ? "text-orange-600 bg-orange-50"
+        : "text-gray-700 hover:text-orange-600 hover:bg-gray-50"
+    }`;
+
   function handleLogout() {
     logout();
     setUserMenuOpen(false);
@@ -90,7 +102,12 @@ export function Header() {
   }
 
   const mobileItems = isAuthenticated
-    ? [{ path: "/rastreamento", label: "Rastreamento" }, ...panels, { path: "/perfil", label: "Meu perfil" }]
+    ? [
+        { path: "/rastreamento", label: "Rastreamento" },
+        ...panels,
+        { path: "/perfil", label: "Meu perfil" },
+        { path: settingsPath, label: "Configurações" },
+      ]
     : [...publicNavItems, ...publicExtraItems];
 
   return (
@@ -166,15 +183,7 @@ export function Header() {
                       {morePanelsOpen && (
                         <div className="absolute right-0 mt-3 w-60 rounded-xl border border-gray-100 bg-white py-2 shadow-xl">
                           {morePanels.map((item) => (
-                            <Link
-                              key={item.path}
-                              to={item.path}
-                              className={`block px-4 py-2.5 text-sm font-semibold transition-colors ${
-                                isActive(item.path)
-                                  ? "text-orange-600 bg-orange-50"
-                                  : "text-gray-700 hover:text-orange-600 hover:bg-gray-50"
-                              }`}
-                            >
+                            <Link key={item.path} to={item.path} className={menuItemClass(item.path)}>
                               {item.label}
                             </Link>
                           ))}
@@ -208,15 +217,13 @@ export function Header() {
                           <div className="font-bold text-gray-900 truncate">{user?.name}</div>
                           <div className="text-xs text-gray-500 truncate">{user?.email}</div>
                         </div>
-                        <Link
-                          to="/perfil"
-                          className={`block px-4 py-2.5 text-sm font-semibold transition-colors ${
-                            isActive("/perfil")
-                              ? "text-orange-600 bg-orange-50"
-                              : "text-gray-700 hover:text-orange-600 hover:bg-gray-50"
-                          }`}
-                        >
+                        <Link to="/perfil" className={menuItemClass("/perfil")}>
+                          <UserCircle className="w-4 h-4" />
                           Meu perfil
+                        </Link>
+                        <Link to={settingsPath} className={menuItemClass(settingsPath)}>
+                          <SettingsIcon className="w-4 h-4" />
+                          Configurações
                         </Link>
                         <button
                           type="button"
