@@ -26,6 +26,7 @@ import {
   type NotificationChannel,
   type NotificationEvent,
 } from "../settings/SettingsContext";
+import { themeOptions, usePreferences } from "../preferences/PreferencesContext";
 
 type SectionId = "perfil" | "seguranca" | "notificacoes" | "paineis" | "acessibilidade" | "privacidade";
 
@@ -34,7 +35,7 @@ const sections: { id: SectionId; label: string; description: string; icon: Lucid
   { id: "seguranca", label: "Segurança", description: "Senha e sessão", icon: Lock },
   { id: "notificacoes", label: "Notificações", description: "Canais e alertas", icon: Bell },
   { id: "paineis", label: "Painéis", description: "Menu e página inicial", icon: LayoutDashboard },
-  { id: "acessibilidade", label: "Acessibilidade", description: "Texto e animações", icon: Accessibility },
+  { id: "acessibilidade", label: "Aparência", description: "Tema, texto e animações", icon: Accessibility },
   { id: "privacidade", label: "Privacidade e dados", description: "Cookies e seus dados", icon: ShieldCheck },
 ];
 
@@ -510,10 +511,35 @@ function PanelsSection() {
 
 function AccessibilitySection() {
   const { settings, updateSettings } = useSettings();
+  const { theme, setTheme } = usePreferences();
 
   return (
-    <Card title="Acessibilidade" description="Vale para o site inteiro e é aplicado na hora.">
-      <div className="mb-2">
+    <Card title="Aparência e acessibilidade" description="Vale para o site inteiro e é aplicado na hora.">
+      <div className="mb-6">
+        <div className="font-bold text-gray-900 mb-3">Tema</div>
+        <div role="radiogroup" aria-label="Tema" className="grid sm:grid-cols-3 gap-3">
+          {themeOptions.map((option) => {
+            const active = theme === option.id;
+            return (
+              <button
+                key={option.id}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => setTheme(option.id)}
+                className={`rounded-xl border-2 px-4 py-3 text-left transition-colors ${
+                  active ? "border-orange-600 bg-orange-50 text-orange-700" : "border-gray-200 text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                <span className="block font-bold">{option.label}</span>
+                <span className="block text-xs mt-1">{option.description}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mb-2 border-t border-gray-100 pt-6">
         <div className="font-bold text-gray-900 mb-3">Tamanho do texto</div>
         <div role="radiogroup" aria-label="Tamanho do texto" className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {(Object.keys(fontScaleLabels) as FontScale[]).map((scale) => {
