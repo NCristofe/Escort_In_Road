@@ -52,7 +52,7 @@ export const services: Service[] = [
     ],
     idealFor: ["Grandes volumes", "Urgências", "Carga paletizada", "Operações dedicadas"],
     metrics: [
-      { value: "800+", label: "veículos na frota" },
+      { value: "GPS", label: "rastreamento da viagem" },
       { value: "24/7", label: "monitoramento" },
       { value: "99%", label: "cumprimento de SLA" },
     ],
