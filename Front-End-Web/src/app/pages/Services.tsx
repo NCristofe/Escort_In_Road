@@ -14,7 +14,7 @@ const iconBySlug = {
 };
 
 const differentials = [
-  "Frota própria com mais de 800 veículos",
+  "Gestão de frota própria e de parceiros em uma só plataforma",
   "Equipe especializada e treinada continuamente",
   "Tecnologia de ponta em rastreamento GPS",
   "Seguro completo de cargas incluso",
