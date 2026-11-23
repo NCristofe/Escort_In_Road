@@ -51,10 +51,10 @@ export function Home() {
   ];
 
   const stats = [
-    { value: "15+", label: "Anos de Mercado" },
-    { value: "800+", label: "Caminhões" },
-    { value: "100k+", label: "Entregas/Mês" },
-    { value: "99%", label: "Satisfação" },
+    { value: "2026", label: "Início do Projeto" },
+    { value: "24/7", label: "Rastreamento Online" },
+    { value: "3", label: "Perfis de Acesso" },
+    { value: "ESG", label: "Painel de Emissões" },
   ];
 
   const testimonials = [
