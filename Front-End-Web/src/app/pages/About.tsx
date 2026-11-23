@@ -44,9 +44,9 @@ export function About() {
           </div>
           <div className="grid sm:grid-cols-2 gap-5">
             {[
-              { icon: Truck, value: "800+", label: "veículos monitorados" },
-              { icon: MapPin, value: "27", label: "estados atendidos" },
-              { icon: Users, value: "100k+", label: "entregas por mês" },
+              { icon: Truck, value: "2026", label: "início do projeto" },
+              { icon: MapPin, value: "GPS", label: "mapa operacional em tempo real" },
+              { icon: Users, value: "3", label: "perfis de acesso" },
               { icon: Shield, value: "24h", label: "controle operacional" },
             ].map((item) => (
               <div key={item.label} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
