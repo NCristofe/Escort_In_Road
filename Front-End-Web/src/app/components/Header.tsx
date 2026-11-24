@@ -79,6 +79,12 @@ export function Header() {
     : [];
   const inlinePanels = panels.slice(0, INLINE_PANEL_LIMIT);
   const morePanels = panels.slice(INLINE_PANEL_LIMIT);
+  /**
+   * O que fica no "Mais" do desktop: painéis excedentes (logado) ou as páginas
+   * institucionais extras (visitante). Tem que bater com o menu do celular,
+   * senão uma página aparece num aparelho e some no outro.
+   */
+  const moreItems = isAuthenticated ? morePanels : publicExtraItems;
   const homePath = user ? resolveHomePage(user.role, settings.homePage) : "/";
 
   useEffect(() => {
@@ -202,40 +208,6 @@ export function Header() {
                       {item.label}
                     </Link>
                   ))}
-
-                  {morePanels.length > 0 && (
-                    <div className="relative" ref={morePanelsRef}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setMorePanelsOpen((open) => !open);
-                          setUserMenuOpen(false);
-                        }}
-                        aria-expanded={morePanelsOpen}
-                        aria-haspopup="true"
-                        className={`flex items-center gap-1 ${
-                          morePanels.some((item) => isActive(item.path))
-                            ? "text-orange-600"
-                            : "text-gray-700 hover:text-orange-600"
-                        } font-semibold text-xs xl:text-sm 2xl:text-base transition-colors`}
-                      >
-                        Mais
-                        <ChevronDown
-                          className={`w-4 h-4 transition-transform ${morePanelsOpen ? "rotate-180" : ""}`}
-                        />
-                      </button>
-
-                      {morePanelsOpen && (
-                        <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-60 rounded-xl border border-gray-100 bg-white py-2 shadow-xl">
-                          {morePanels.map((item) => (
-                            <Link key={item.path} to={item.path} className={menuItemClass(item.path)}>
-                              {item.label}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </>
               ) : (
                 publicNavItems.map((item) => (
@@ -243,6 +215,40 @@ export function Header() {
                     {item.label}
                   </Link>
                 ))
+              )}
+
+              {moreItems.length > 0 && (
+                <div className="relative" ref={morePanelsRef}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMorePanelsOpen((open) => !open);
+                      setUserMenuOpen(false);
+                    }}
+                    aria-expanded={morePanelsOpen}
+                    aria-haspopup="true"
+                    className={`flex items-center gap-1 ${
+                      moreItems.some((item) => isActive(item.path))
+                        ? "text-orange-600"
+                        : "text-gray-700 hover:text-orange-600"
+                    } font-semibold text-xs xl:text-sm 2xl:text-base transition-colors`}
+                  >
+                    Mais
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${morePanelsOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+
+                  {morePanelsOpen && (
+                    <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-60 rounded-xl border border-gray-100 bg-white py-2 shadow-xl">
+                      {moreItems.map((item) => (
+                        <Link key={item.path} to={item.path} className={menuItemClass(item.path)}>
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               )}
             </nav>
 
