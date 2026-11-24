@@ -20,8 +20,9 @@ export function Login() {
   const location = useLocation();
   const { login } = useAuth();
   const { settings } = useSettings();
-  const [email, setEmail] = useState("admin@escortinroad.com.br");
-  const [password, setPassword] = useState("admin123");
+  // Campos vazios: entrar exige digitar (ou escolher uma conta de demonstracao abaixo).
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const from = (location.state as LocationState | null)?.from;
