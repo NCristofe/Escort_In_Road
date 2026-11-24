@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { loadFromStorage, saveToStorage } from "../lib/storage";
 
 export type Role = "admin" | "empresa" | "motorista";
@@ -43,7 +43,22 @@ type AuthContextValue = {
   deleteAccount: () => void;
 };
 
-const sessionKey = "escort-auth-user";
+/**
+ * Sessao com prazo. Antes ela ficava salva sem validade, e quem entrou uma vez
+ * como admin num navegador continuava admin para sempre ao abrir o site.
+ */
+const sessionKey = "escort-auth-session";
+/** Formato antigo (sem prazo). Apagado no carregamento para derrubar sessoes eternas. */
+const legacySessionKey = "escort-auth-user";
+/** Sem nenhuma interacao por este tempo, a sessao expira. */
+export const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
+/** Mesmo com uso continuo, e preciso entrar de novo depois disto. */
+export const SESSION_MAX_AGE_MS = 8 * 60 * 60 * 1000;
+/** Intervalo minimo entre gravacoes de "ultima atividade". */
+const ACTIVITY_WRITE_INTERVAL_MS = 60 * 1000;
+
+type StoredSession = { user: AuthUser; loginAt: number; lastActiveAt: number };
+
 const accountsKey = "escort-auth-accounts";
 /** Marca que as contas de demonstracao ja foram gravadas; sem isto, uma conta apagada voltaria. */
 const seededKey = "escort-auth-seeded";
@@ -144,17 +159,115 @@ function clean(value: string | undefined) {
   return trimmed ? trimmed : undefined;
 }
 
+function removeKey(key: string) {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // storage indisponivel: nada salvo para remover
+  }
+}
+
+function isSessionValid(session: StoredSession, now = Date.now()) {
+  return (
+    now - session.loginAt < SESSION_MAX_AGE_MS &&
+    now - session.lastActiveAt < SESSION_IDLE_TIMEOUT_MS &&
+    // relogio adiantado ou dado adulterado: nao confia
+    session.loginAt <= now &&
+    session.lastActiveAt <= now
+  );
+}
+
+/** Sessao salva, se ainda estiver no prazo e a conta ainda existir. Caso contrario, apaga. */
+function readSession(): StoredSession | null {
+  removeKey(legacySessionKey);
+
+  const session = loadFromStorage<StoredSession | null>(sessionKey, null);
+  if (
+    !session ||
+    typeof session.loginAt !== "number" ||
+    typeof session.lastActiveAt !== "number" ||
+    !session.user?.email ||
+    !isSessionValid(session) ||
+    !findAccount(session.user.email)
+  ) {
+    removeKey(sessionKey);
+    return null;
+  }
+  return session;
+}
+
+function clearSession() {
+  removeKey(sessionKey);
+  removeKey(legacySessionKey);
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(() => {
     ensureSeeded();
-    return loadFromStorage<AuthUser | null>(sessionKey, null);
+    return readSession()?.user ?? null;
   });
 
+  // Enquanto houver sessao: renova a "ultima atividade" quando a pessoa usa a
+  // pagina e encerra a sessao assim que o prazo vencer, mesmo com a aba aberta.
+  useEffect(() => {
+    if (!user) return;
+
+    let lastWrite = 0;
+    const touch = () => {
+      const now = Date.now();
+      if (now - lastWrite < ACTIVITY_WRITE_INTERVAL_MS) return;
+
+      const session = loadFromStorage<StoredSession | null>(sessionKey, null);
+      if (!session || !isSessionValid(session, now)) return;
+
+      lastWrite = now;
+      saveToStorage(sessionKey, { ...session, lastActiveAt: now });
+    };
+
+    const check = () => {
+      if (!readSession()) setUser(null);
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState !== "visible") return;
+      check();
+      touch();
+    };
+
+    // Login/logout em outra aba vale para esta tambem.
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === sessionKey || event.key === null) check();
+    };
+
+    const activityEvents = ["pointerdown", "keydown", "scroll"] as const;
+    activityEvents.forEach((name) => window.addEventListener(name, touch, { passive: true }));
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("storage", onStorage);
+    const timer = window.setInterval(check, 30 * 1000);
+
+    return () => {
+      activityEvents.forEach((name) => window.removeEventListener(name, touch));
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("storage", onStorage);
+      window.clearInterval(timer);
+    };
+  }, [user]);
+
   const value = useMemo<AuthContextValue>(() => {
-    /** Guarda a sessao e devolve a conta, sem a senha. */
-    function startSession(account: StoredAccount) {
+    /**
+     * Guarda a sessao e devolve a conta, sem a senha.
+     * Num login, comeca um prazo novo; ao atualizar o perfil, mantem o prazo atual.
+     */
+    function startSession(account: StoredAccount, { renew = true } = {}) {
       const nextUser = toSessionUser(account);
-      saveToStorage(sessionKey, nextUser);
+      const now = Date.now();
+      const current = renew ? null : loadFromStorage<StoredSession | null>(sessionKey, null);
+      const session: StoredSession = {
+        user: nextUser,
+        loginAt: current?.loginAt ?? now,
+        lastActiveAt: now,
+      };
+      saveToStorage(sessionKey, session);
       setUser(nextUser);
       return nextUser;
     }
@@ -184,7 +297,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
 
       logout: () => {
-        localStorage.removeItem(sessionKey);
+        clearSession();
         setUser(null);
       },
 
@@ -204,7 +317,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         const nextAccount = { ...account, name: clean(changes.name) ?? account.name };
         writeAccount(nextAccount);
-        startSession(nextAccount);
+        startSession(nextAccount, { renew: false });
         return true;
       },
 
@@ -218,7 +331,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!account) return { message: "Conta não encontrada." };
 
         writeAccount({ ...account, name: trimmed });
-        startSession({ ...account, name: trimmed });
+        startSession({ ...account, name: trimmed }, { renew: false });
         return null;
       },
 
@@ -247,7 +360,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { [email]: _removed, ...otherProfiles } = loadProfiles();
         saveToStorage(profilesKey, otherProfiles);
 
-        localStorage.removeItem(sessionKey);
+        clearSession();
         setUser(null);
       },
     };
