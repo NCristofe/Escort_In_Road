@@ -191,7 +191,7 @@ export function Header() {
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-2xl text-gray-900">ESCORT<span className="text-orange-600">in</span>Road</span>
-                <span className="text-xs text-orange-600 font-semibold tracking-wide">TRANSPORTE E LOGÍSTICA</span>
+                <span className="text-xs text-orange-600 font-semibold tracking-wide">FRETE DE RETORNO</span>
               </div>
             </Link>
 

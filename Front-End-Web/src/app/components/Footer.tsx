@@ -14,7 +14,7 @@ export function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-xl text-white">ESCORT<span className="text-orange-400">in</span>Road</span>
-                <span className="text-xs text-orange-400 font-semibold tracking-wide">TRANSPORTE E LOGÍSTICA</span>
+                <span className="text-xs text-orange-400 font-semibold tracking-wide">FRETE DE RETORNO</span>
               </div>
             </div>
             <p className="text-sm text-gray-400 mb-4">
@@ -106,12 +106,11 @@ export function Footer() {
           <div>
             <h3 className="font-bold text-white mb-4">Serviços</h3>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/servicos/carga-fracionada" className="hover:text-orange-400 transition-colors">Carga Fracionada</Link></li>
-              <li><Link to="/servicos/carga-completa" className="hover:text-orange-400 transition-colors">Carga Completa</Link></li>
-              <li><Link to="/servicos/armazenagem" className="hover:text-orange-400 transition-colors">Armazenagem</Link></li>
-              <li><Link to="/servicos/entregas-expressas" className="hover:text-orange-400 transition-colors">Entregas Expressas</Link></li>
-              <li><Link to="/servicos/cargas-especiais" className="hover:text-orange-400 transition-colors">Cargas Especiais</Link></li>
-              <li><Link to="/servicos/consultoria-logistica" className="hover:text-orange-400 transition-colors">Consultoria Logística</Link></li>
+              <li><Link to="/servicos/frete-de-retorno" className="hover:text-orange-400 transition-colors">Frete de Retorno</Link></li>
+              <li><Link to="/servicos/ocupacao-de-frota" className="hover:text-orange-400 transition-colors">Ocupação de Frota</Link></li>
+              <li><Link to="/servicos/pagamento-protegido" className="hover:text-orange-400 transition-colors">Pagamento Protegido</Link></li>
+              <li><Link to="/servicos/rastreamento-e-canhoto" className="hover:text-orange-400 transition-colors">Rastreamento e Canhoto</Link></li>
+              <li><Link to="/servicos/indicadores-esg" className="hover:text-orange-400 transition-colors">Indicadores ESG</Link></li>
             </ul>
           </div>
 
@@ -140,7 +139,7 @@ export function Footer() {
 
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-400">
-            <p>&copy; 2026 ESCORTinRoad Transporte e Logística. Todos os direitos reservados.</p>
+            <p>&copy; 2026 ESCORTinRoad. Todos os direitos reservados.</p>
             <div className="flex flex-wrap justify-center gap-6">
               <Link to="/faq" className="hover:text-orange-400 transition-colors">FAQ</Link>
               <Link to="/trabalhe-conosco" className="hover:text-orange-400 transition-colors">Trabalhe Conosco</Link>

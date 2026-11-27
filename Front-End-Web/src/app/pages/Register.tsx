@@ -24,7 +24,7 @@ export function Register() {
     const account = register(name, email, password, role);
 
     if (!account) {
-      setError("Preencha nome, e-mail e uma senha com pelo menos 6 caracteres. Verifique se o e-mail ja esta cadastrado.");
+      setError("Preencha nome, e-mail e uma senha com pelo menos 8 caracteres. Verifique se o e-mail já está cadastrado.");
       return;
     }
 
@@ -103,7 +103,7 @@ export function Register() {
                 <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   required
-                  minLength={6}
+                  minLength={8}
                   type="password"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}

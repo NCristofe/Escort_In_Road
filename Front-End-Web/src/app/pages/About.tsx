@@ -11,29 +11,29 @@ export function About() {
   ];
 
   const timeline = [
-    { year: "2026", text: "Quando começou a ideia de implementar " },
-    { year: "2026", text: "Início da operação com foco em transporte rodoviário regional." },
+    { year: "2026", text: "Concepção do projeto: uma plataforma para ocupar o retorno ocioso dos caminhões." },
+    { year: "2026", text: "Desenvolvimento do MVP: casamento de rotas, aplicativo do motorista e pagamento retido até a entrega." },
   ];
 
   return (
     <div>
       <PageHero
         eyebrow="Quem Somos"
-        title="Logística com escala, presença e responsabilidade"
-        description="A ESCORTinRoad conecta empresas, cargas e destinos com transporte rodoviário, armazenagem e tecnologia para operações de todos os portes."
+        title="Para nenhum caminhão voltar vazio"
+        description="A ESCORTinRoad é uma plataforma de frete de retorno: conecta empresas sem frota (ESF) a transportadoras com frota (ECF) cujos caminhões voltariam vazios."
       />
 
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
-              Uma transportadora preparada para operações exigentes
+              Uma plataforma, não uma transportadora
             </h2>
             <p className="text-lg text-gray-600 mb-6">
-              Atuamos em transporte rodoviário de cargas, distribuição, armazenagem e projetos logísticos. Nossa estrutura combina frota, centros parceiros, equipe de atendimento e monitoramento ativo.
+              Não temos frota própria. Os caminhões são das transportadoras parceiras, e os motoristas são empregados delas. A Escort encontra a carga certa para cada retorno, acompanha a viagem e protege o pagamento até a entrega.
             </p>
             <p className="text-lg text-gray-600 mb-8">
-              O objetivo é simples: reduzir incertezas da operação logística e dar visibilidade para que cada cliente tome decisões com confiança.
+              O objetivo é simples: ocupar o espaço ocioso da volta, com frete mais barato para quem contrata e receita extra para quem transporta.
             </p>
             <Link
               to="/cotacao"
@@ -47,7 +47,7 @@ export function About() {
               { icon: Truck, value: "2026", label: "início do projeto" },
               { icon: MapPin, value: "GPS", label: "mapa operacional em tempo real" },
               { icon: Users, value: "3", label: "perfis de acesso" },
-              { icon: Shield, value: "24h", label: "controle operacional" },
+              { icon: Shield, value: "85/15", label: "divisão do frete ECF/Escort" },
             ].map((item) => (
               <div key={item.label} className="bg-gray-50 rounded-xl p-6 border border-gray-100">
                 <item.icon className="w-8 h-8 text-orange-600 mb-4" />
@@ -63,7 +63,7 @@ export function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Nossos valores</h2>
-            <p className="text-xl text-gray-600">A base que orienta cada coleta, viagem e entrega.</p>
+            <p className="text-xl text-gray-600">A base que orienta cada frete de retorno.</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {values.map((value) => (
@@ -86,7 +86,7 @@ export function About() {
           </h2>
           <div className="space-y-6">
             {timeline.map((item) => (
-              <div key={item.year} className="flex gap-5 bg-gray-50 p-6 rounded-xl border border-gray-100">
+              <div key={item.text} className="flex gap-5 bg-gray-50 p-6 rounded-xl border border-gray-100">
                 <div className="text-2xl font-bold text-orange-600 w-24 flex-shrink-0">{item.year}</div>
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
