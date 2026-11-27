@@ -68,7 +68,7 @@ const templateHeaders = [...requiredColumns, ...optionalColumns];
 const templateRows = [
   [
     "PED-1001",
-    "Sao Paulo/SP",
+    "São Paulo/SP",
     "Rio de Janeiro/RJ",
     "2026-06-22",
     "2026-06-24",
@@ -246,16 +246,16 @@ export function BulkUpload() {
       setRows(parsed.parsedRows);
       if (parsed.parsedRows.length === 0) setErrorMessage("Nenhum pedido foi encontrado no arquivo.");
     } catch {
-      setErrorMessage("Nao foi possivel ler o arquivo. Verifique o formato e tente novamente.");
+      setErrorMessage("Não foi possível ler o arquivo. Verifique o formato e tente novamente.");
     }
   };
 
   return (
     <div>
       <PageHero
-        eyebrow="Gestao de Lotes"
+        eyebrow="Gestão de Lotes"
         title="Importe pedidos em massa"
-        description="Suba arquivos Excel ou CSV, valide os dados do lote e prepare multiplos pedidos para programacao operacional."
+        description="Suba arquivos Excel ou CSV, valide os dados do lote e prepare múltiplos pedidos para programação operacional."
       />
 
       <section className="py-16 bg-gray-50">
@@ -312,7 +312,7 @@ export function BulkUpload() {
             </div>
 
             <div className="bg-white rounded-2xl shadow-lg p-6">
-              <h3 className="font-bold text-gray-900 mb-3">Colunas obrigatorias</h3>
+              <h3 className="font-bold text-gray-900 mb-3">Colunas obrigatórias</h3>
               <div className="flex flex-wrap gap-2">
                 {requiredColumns.map((column) => (
                   <span key={column} className="bg-orange-50 text-orange-700 px-3 py-1 rounded-full text-xs font-bold">
@@ -328,7 +328,7 @@ export function BulkUpload() {
               <div className="bg-red-50 border-2 border-red-100 rounded-2xl p-5 flex items-start gap-3">
                 <AlertTriangle className="w-6 h-6 text-red-600 mt-0.5" />
                 <div>
-                  <h3 className="font-bold text-red-900 mb-1">Importacao pendente de ajuste</h3>
+                  <h3 className="font-bold text-red-900 mb-1">Importação pendente de ajuste</h3>
                   {errorMessage && <p className="text-red-700">{errorMessage}</p>}
                   {missingColumns.length > 0 && (
                     <p className="text-red-700">

@@ -59,7 +59,7 @@ export function Login() {
           </p>
 
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="font-bold text-gray-900 mb-4">Contas de demonstracao</h2>
+            <h2 className="font-bold text-gray-900 mb-4">Contas de demonstração</h2>
             <div className="grid sm:grid-cols-3 gap-3">
               {demoAccounts.map((account) => (
                 <button

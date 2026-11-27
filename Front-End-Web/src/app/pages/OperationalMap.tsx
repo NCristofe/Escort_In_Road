@@ -53,10 +53,10 @@ const mapItems: MapItem[] = [
     id: "TRK-0187",
     type: "truck",
     title: "Truck vazio",
-    location: "Sao Paulo/SP",
+    location: "São Paulo/SP",
     lat: -23.5505,
     lng: -46.6333,
-    route: "Sao Paulo/SP -> Curitiba/PR",
+    route: "São Paulo/SP -> Curitiba/PR",
     status: "Vazio ha 2h",
     priority: "normal",
     details: "Carreta sider, 28 pallets, motorista liberado para carga no corredor Regis Bittencourt.",
@@ -68,10 +68,10 @@ const mapItems: MapItem[] = [
     location: "Embu das Artes/SP",
     lat: -23.6489,
     lng: -46.8522,
-    route: "Sao Paulo/SP -> Curitiba/PR",
+    route: "São Paulo/SP -> Curitiba/PR",
     status: "Aguardando carga",
     priority: "alta",
-    details: "Truck bau seco proximo ao acesso da BR-116, pronto para coleta imediata.",
+    details: "Truck baú seco próximo ao acesso da BR-116, pronto para coleta imediata.",
   },
   {
     id: "TRK-0441",
@@ -80,10 +80,10 @@ const mapItems: MapItem[] = [
     location: "Registro/SP",
     lat: -24.4979,
     lng: -47.8449,
-    route: "Sao Paulo/SP -> Curitiba/PR",
+    route: "São Paulo/SP -> Curitiba/PR",
     status: "Disponivel",
     priority: "normal",
-    details: "Carreta bau seca em ponto intermediario, aceita carga complementar para Curitiba.",
+    details: "Carreta baú seca em ponto intermediário, aceita carga complementar para Curitiba.",
   },
   {
     id: "TRK-0730",
@@ -92,10 +92,10 @@ const mapItems: MapItem[] = [
     location: "Cajati/SP",
     lat: -24.7366,
     lng: -48.1228,
-    route: "Sao Paulo/SP -> Curitiba/PR",
+    route: "São Paulo/SP -> Curitiba/PR",
     status: "Janela aberta ate 20h",
     priority: "normal",
-    details: "Veiculo no eixo da BR-116, pode seguir com carga complementar para Curitiba.",
+    details: "Veículo no eixo da BR-116, pode seguir com carga complementar para Curitiba.",
   },
   {
     id: "TRK-0912",
@@ -104,7 +104,7 @@ const mapItems: MapItem[] = [
     location: "Curitiba/PR",
     lat: -25.4284,
     lng: -49.2733,
-    route: "Sao Paulo/SP -> Curitiba/PR",
+    route: "São Paulo/SP -> Curitiba/PR",
     status: "Retorno disponivel",
     priority: "alta",
     details: "Carreta posicionada em Curitiba para finalizar ou redistribuir cargas do corredor.",
@@ -116,10 +116,10 @@ const mapItems: MapItem[] = [
     location: "Guarulhos/SP",
     lat: -23.4543,
     lng: -46.5337,
-    route: "Sao Paulo/SP -> Curitiba/PR",
+    route: "São Paulo/SP -> Curitiba/PR",
     status: "Coleta ate 18h",
     priority: "critica",
-    details: "Eletronicos, 14 volumes, seguro obrigatorio. Destino final Curitiba/PR.",
+    details: "Eletrônicos, 14 volumes, seguro obrigatório. Destino final Curitiba/PR.",
   },
   {
     id: "LOD-7811",
@@ -128,7 +128,7 @@ const mapItems: MapItem[] = [
     location: "Osasco/SP",
     lat: -23.5329,
     lng: -46.7918,
-    route: "Sao Paulo/SP -> Curitiba/PR",
+    route: "São Paulo/SP -> Curitiba/PR",
     status: "Sem veiculo alocado",
     priority: "alta",
     details: "Autopecas, 9 toneladas, carga paletizada com entrega D+1 em Curitiba.",
@@ -137,13 +137,13 @@ const mapItems: MapItem[] = [
     id: "LOD-7820",
     type: "load",
     title: "Carga pendente",
-    location: "Sao Jose dos Pinhais/PR",
+    location: "São José dos Pinhais/PR",
     lat: -25.5313,
     lng: -49.2031,
-    route: "Sao Paulo/SP -> Curitiba/PR",
+    route: "São Paulo/SP -> Curitiba/PR",
     status: "Aguardando aceite",
     priority: "normal",
-    details: "Bebidas, 18 pallets, descarga na regiao metropolitana de Curitiba.",
+    details: "Bebidas, 18 pallets, descarga na região metropolitana de Curitiba.",
   },
   {
     id: "LOD-7836",
@@ -152,10 +152,10 @@ const mapItems: MapItem[] = [
     location: "Itapecerica da Serra/SP",
     lat: -23.7169,
     lng: -46.8497,
-    route: "Sao Paulo/SP -> Curitiba/PR",
+    route: "São Paulo/SP -> Curitiba/PR",
     status: "Alta demanda",
     priority: "critica",
-    details: "Produtos farmaceuticos, temperatura controlada e acompanhamento dedicado ate Curitiba.",
+    details: "Produtos farmacêuticos, temperatura controlada e acompanhamento dedicado até Curitiba.",
   },
   {
     id: "LOD-7842",
@@ -164,7 +164,7 @@ const mapItems: MapItem[] = [
     location: "Curitiba/PR",
     lat: -25.4284,
     lng: -49.2733,
-    route: "Sao Paulo/SP -> Curitiba/PR",
+    route: "São Paulo/SP -> Curitiba/PR",
     status: "Coleta programada",
     priority: "alta",
     details: "Industrial, 22 toneladas, precisa escolta no trecho urbano de chegada em Curitiba.",
@@ -173,7 +173,7 @@ const mapItems: MapItem[] = [
 
 const filters = [
   { id: "all", label: "Todos" },
-  { id: "truck", label: "Caminhoes vazios" },
+  { id: "truck", label: "Caminhões vazios" },
   { id: "load", label: "Cargas pendentes" },
 ] as const;
 
@@ -196,7 +196,7 @@ type PointOfInterest = {
 
 const poiCategories: Record<PoiCategory, { label: string; short: string; color: string; icon: typeof Coffee }> = {
   parada: { label: "Parada parceira", short: "Parada", color: "#059669", icon: Coffee },
-  posto: { label: "Posto de combustivel", short: "Posto", color: "#7c3aed", icon: Fuel },
+  posto: { label: "Posto de combustível", short: "Posto", color: "#7c3aed", icon: Fuel },
   oficina: { label: "Oficina", short: "Oficina", color: "#0891b2", icon: Wrench },
 };
 
@@ -219,13 +219,13 @@ const pointsOfInterest: PointOfInterest[] = [
     id: "POI-108",
     category: "parada",
     name: "Parada Serra do Cafezal",
-    location: "Sao Lourenco da Serra/SP",
+    location: "São Lourenço da Serra/SP",
     km: "BR-116 km 297",
     lat: -23.8467,
     lng: -46.9436,
     hours: "05h as 23h",
     partner: true,
-    services: ["Restaurante", "Banho quente", "Wi-Fi", "Area de descanso"],
+    services: ["Restaurante", "Banho quente", "Wi-Fi", "Área de descanso"],
   },
   {
     id: "POI-114",
@@ -237,7 +237,7 @@ const pointsOfInterest: PointOfInterest[] = [
     lng: -47.0686,
     hours: "07h as 19h",
     partner: false,
-    services: ["Mecanica pesada", "Borracharia", "Eletrica 24h", "Socorro na via"],
+    services: ["Mecânica pesada", "Borracharia", "Elétrica 24h", "Socorro na via"],
   },
   {
     id: "POI-121",
@@ -309,7 +309,7 @@ const pointsOfInterest: PointOfInterest[] = [
     lng: -49.1867,
     hours: "07h as 20h",
     partner: true,
-    services: ["Mecanica pesada", "Diagnostico eletronico", "Ar-condicionado", "Pneus"],
+    services: ["Mecânica pesada", "Diagnóstico eletrônico", "Ar-condicionado", "Pneus"],
   },
 ];
 
@@ -458,7 +458,7 @@ export function OperationalMap() {
       opacity: 0.82,
       dashArray: "10 10",
     })
-      .bindTooltip("Corredor Sao Paulo -> Curitiba", { sticky: true })
+      .bindTooltip("Corredor São Paulo -> Curitiba", { sticky: true })
       .addTo(map);
 
     map.fitBounds(corridorBounds, { padding: [18, 18] });
@@ -530,18 +530,18 @@ export function OperationalMap() {
   return (
     <div>
       <PageHero
-        eyebrow="Visualizacao Geografica"
-        title="Mapa operacional Sao Paulo -> Curitiba"
-        description="Veja caminhoes vazios, cargas pendentes e pontos de apoio no corredor SP-PR para reduzir ociosidade e acelerar alocacoes."
+        eyebrow="Visualização Geográfica"
+        title="Mapa operacional São Paulo → Curitiba"
+        description="Veja caminhões vazios, cargas pendentes e pontos de apoio no corredor SP-PR para reduzir ociosidade e acelerar alocações."
       />
 
       <section className="py-12 lg:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
             {[
-              { icon: Truck, value: emptyTrucks, label: "caminhoes vazios", color: "text-blue-700", bg: "bg-blue-50" },
+              { icon: Truck, value: emptyTrucks, label: "caminhões vazios", color: "text-blue-700", bg: "bg-blue-50" },
               { icon: Package, value: pendingLoads, label: "cargas pendentes", color: "text-orange-700", bg: "bg-orange-50" },
-              { icon: AlertTriangle, value: criticalLoads, label: "prioridades criticas", color: "text-red-700", bg: "bg-red-50" },
+              { icon: AlertTriangle, value: criticalLoads, label: "prioridades críticas", color: "text-red-700", bg: "bg-red-50" },
               { icon: Coffee, value: partnerPois, label: "pontos parceiros", color: "text-emerald-700", bg: "bg-emerald-50" },
             ].map((metric) => (
               <div key={metric.label} className="bg-white rounded-xl shadow-md p-5 flex items-center gap-4">
@@ -561,7 +561,7 @@ export function OperationalMap() {
               <div className="p-5 border-b border-gray-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">Mapa operacional</h2>
-                  <p className="text-gray-600">Mapa real do trecho Sao Paulo &rarr; Curitiba com base OpenStreetMap.</p>
+                  <p className="text-gray-600">Mapa real do trecho São Paulo &rarr; Curitiba com base OpenStreetMap.</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {filters.map((filter) => (
@@ -596,7 +596,7 @@ export function OperationalMap() {
                 <div
                   ref={mapElementRef}
                   className="relative z-0 h-[420px] sm:h-[560px] rounded-xl overflow-hidden border border-gray-200 bg-gray-100"
-                  aria-label="Mapa real do corredor Sao Paulo Curitiba com caminhoes vazios, cargas pendentes e pontos de apoio"
+                  aria-label="Mapa real do corredor São Paulo Curitiba com caminhões vazios, cargas pendentes e pontos de apoio"
                 />
                 <div className="flex flex-wrap gap-3 mt-4 text-sm text-gray-600">
                   <span className="inline-flex items-center gap-2">
@@ -636,7 +636,7 @@ export function OperationalMap() {
                   <div className="flex items-start gap-3">
                     <MapPin className="w-5 h-5 text-orange-600 mt-1" />
                     <div>
-                      <div className="text-sm text-gray-500">Localizacao</div>
+                      <div className="text-sm text-gray-500">Localização</div>
                       <div className="font-bold text-gray-900">{selectedItem.location}</div>
                     </div>
                   </div>
@@ -661,7 +661,7 @@ export function OperationalMap() {
               <div className="bg-white rounded-2xl shadow-lg p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <Filter className="w-5 h-5 text-orange-600" />
-                  <h3 className="font-bold text-gray-900">Fila visivel</h3>
+                  <h3 className="font-bold text-gray-900">Fila visível</h3>
                 </div>
                 <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
                   {visibleItems.map((item) => (

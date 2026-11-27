@@ -1,27 +1,25 @@
-import { ArrowRight, CheckCircle, Clock, Package, Shield, Truck, Users, Warehouse, Zap } from "lucide-react";
+import { ArrowRight, CheckCircle, Leaf, MapPin, Package, Shield, Truck } from "lucide-react";
 import { Link } from "react-router";
 import { PageHero } from "../components/PageHero";
 import { services } from "../data/services";
 
 const iconBySlug = {
-  "carga-fracionada": Package,
-  "carga-completa": Truck,
-  armazenagem: Warehouse,
-  "entregas-expressas": Clock,
-  "cargas-especiais": Shield,
-  ecommerce: Zap,
-  "consultoria-logistica": Users,
+  "frete-de-retorno": Package,
+  "ocupacao-de-frota": Truck,
+  "pagamento-protegido": Shield,
+  "rastreamento-e-canhoto": MapPin,
+  "indicadores-esg": Leaf,
 };
 
 const differentials = [
-  "Gestão de frota própria e de parceiros em uma só plataforma",
-  "Equipe especializada e treinada continuamente",
-  "Tecnologia de ponta em rastreamento GPS",
-  "Seguro completo de cargas incluso",
-  "Atendimento 24 horas, 7 dias por semana",
-  "Cobertura nacional em todos os estados",
-  "Certificações ISO e SASSMAQ",
-  "Sistema de gestão integrado (WMS/TMS)",
+  "Casamento automático entre carga e rota de retorno",
+  "Desvio máximo definido por quem contrata",
+  "Pagamento retido até a entrega confirmada",
+  "Divisão transparente: 85% ECF e 15% Escort",
+  "Rastreamento por GPS durante a viagem",
+  "Comprovação de entrega pela foto do canhoto",
+  "Painel de indicadores ESG",
+  "Somente transportadoras com frota verificada",
 ];
 
 export function Services() {
@@ -32,8 +30,8 @@ export function Services() {
     <div>
       <PageHero
         eyebrow="Serviços"
-        title="Soluções completas em transporte e logística"
-        description="Serviços personalizados para reduzir custos, aumentar previsibilidade e sustentar o crescimento da sua operação."
+        title="Tudo o que o frete de retorno precisa"
+        description="Do casamento entre carga e rota até o repasse do pagamento: aproveitar o caminhão que voltaria vazio, com segurança para quem contrata e para quem transporta."
       />
 
       <section className="py-20 bg-white">
@@ -89,9 +87,9 @@ export function Services() {
       <section className="bg-gray-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Serviços complementares</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Acompanhamento e resultados</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Ampliamos nosso portfólio com soluções especializadas para cada tipo de operação.
+              O que acontece durante e depois da viagem de retorno.
             </p>
           </div>
 
@@ -126,7 +124,7 @@ export function Services() {
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Nossos diferenciais</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              O que torna a ESCORTinRoad uma parceira estratégica para sua operação.
+              Uma plataforma feita para o retorno ocioso, não para o frete comum.
             </p>
           </div>
 
@@ -150,7 +148,7 @@ export function Services() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold mb-4">Solicite uma cotação personalizada</h2>
           <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
-            Nossa equipe está pronta para apresentar a melhor solução para suas necessidades logísticas.
+            Informe origem, destino e datas e veja se há um caminhão voltando pela sua rota.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link

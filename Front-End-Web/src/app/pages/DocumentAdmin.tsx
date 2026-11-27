@@ -74,13 +74,13 @@ const initialDocuments: DriverDocument[] = [
     submittedAt: "2026-06-17 15:31",
     status: "approved",
     fileName: "cnh-rafael-rocha.pdf",
-    notes: "Documento legivel e dentro da validade.",
+    notes: "Documento legível e dentro da validade.",
   },
   {
     id: "DOC-1027",
     driver: "Patricia Gomes Lima",
     cpf: "345.678.901-22",
-    company: "ViaSul Logistica",
+    company: "ViaSul Logística",
     type: "ANTT",
     number: "RNTRC 00124870",
     issuedAt: "2023-03-10",
@@ -88,12 +88,12 @@ const initialDocuments: DriverDocument[] = [
     submittedAt: "2026-06-17 10:19",
     status: "rejected",
     fileName: "antt-patricia-lima.pdf",
-    notes: "Cadastro enviado para renovacao.",
+    notes: "Cadastro enviado para renovação.",
     rejectionReason: "Documento vencido. Enviar comprovante ANTT atualizado.",
   },
   {
     id: "DOC-1028",
-    driver: "Joao Batista Moreira",
+    driver: "João Batista Moreira",
     cpf: "456.789.012-33",
     company: "Prime Rota Cargas",
     type: "CNH",
@@ -165,7 +165,7 @@ export function DocumentAdmin() {
 
   const updateStatus = (status: DocumentStatus) => {
     if (status === "rejected" && !rejectionReason.trim()) {
-      setMessage("Informe o motivo da rejeicao antes de reprovar o documento.");
+      setMessage("Informe o motivo da rejeição antes de reprovar o documento.");
       return;
     }
 
@@ -187,9 +187,9 @@ export function DocumentAdmin() {
   return (
     <div>
       <PageHero
-        eyebrow="Central de Documentacao"
+        eyebrow="Central de Documentação"
         title="Aprove ou rejeite documentos de motoristas"
-        description="Administre CNH e ANTT com fila de analise, historico de status e justificativa obrigatoria para reprovacao."
+        description="Administre CNH e ANTT com fila de análise, histórico de status e justificativa obrigatória para reprovação."
       />
 
       <section className="py-12 lg:py-16 bg-gray-50">
@@ -217,7 +217,7 @@ export function DocumentAdmin() {
               <div className="p-5 border-b border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <Filter className="w-5 h-5 text-orange-600" />
-                  <h2 className="text-xl font-bold text-gray-900">Fila de analise</h2>
+                  <h2 className="text-xl font-bold text-gray-900">Fila de análise</h2>
                 </div>
                 <div className="relative mb-4">
                   <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -368,7 +368,7 @@ export function DocumentAdmin() {
 
                     {selectedDocument.rejectionReason && (
                       <div className="bg-red-50 rounded-xl p-5">
-                        <h3 className="font-bold text-red-900 mb-2">Motivo da rejeicao</h3>
+                        <h3 className="font-bold text-red-900 mb-2">Motivo da rejeição</h3>
                         <p className="text-red-700">{selectedDocument.rejectionReason}</p>
                       </div>
                     )}
@@ -381,7 +381,7 @@ export function DocumentAdmin() {
                         rows={5}
                         value={rejectionReason}
                         onChange={(event) => setRejectionReason(event.target.value)}
-                        placeholder="Informe inconsistencias, vencimento, baixa legibilidade ou divergencia cadastral."
+                        placeholder="Informe inconsistências, vencimento, baixa legibilidade ou divergência cadastral."
                         className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600 focus:border-orange-600 resize-none"
                       />
                     </label>
@@ -411,7 +411,7 @@ export function DocumentAdmin() {
               <div className="bg-orange-600 rounded-2xl shadow-lg p-6 text-white flex flex-col md:flex-row md:items-center gap-4">
                 <User className="w-9 h-9" />
                 <div>
-                  <h3 className="font-bold text-xl">Revisao administrativa</h3>
+                  <h3 className="font-bold text-xl">Revisão administrativa</h3>
                   <p className="text-orange-100">
                     A aprovacao libera o motorista para operacoes. A rejeicao exige justificativa para reenvio do documento.
                   </p>

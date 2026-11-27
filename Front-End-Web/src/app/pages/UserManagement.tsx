@@ -40,17 +40,17 @@ const initialUsers: ManagedUser[] = [
     document: "CPF 123.456.789-10",
     email: "carlos.silva@email.com",
     phone: "(11) 98888-1201",
-    city: "Sao Paulo/SP",
+    city: "São Paulo/SP",
     status: "active",
     profile: "Motorista carreteiro",
     joinedAt: "12/03/2026",
     lastAccess: "Hoje, 08:41",
-    notes: "CNH e ANTT aprovadas. Disponivel para SP -> Curitiba.",
+    notes: "CNH e ANTT aprovadas. Disponível para SP -> Curitiba.",
   },
   {
     id: "MOT-2042",
     kind: "driver",
-    name: "Joao Batista Moreira",
+    name: "João Batista Moreira",
     document: "CPF 456.789.012-33",
     email: "joao.moreira@email.com",
     phone: "(41) 97777-4102",
@@ -59,7 +59,7 @@ const initialUsers: ManagedUser[] = [
     profile: "Motorista truck",
     joinedAt: "18/06/2026",
     lastAccess: "Hoje, 07:59",
-    notes: "Aguardando validacao de CNH enviada pelo app.",
+    notes: "Aguardando validação de CNH enviada pelo app.",
   },
   {
     id: "MOT-2043",
@@ -82,7 +82,7 @@ const initialUsers: ManagedUser[] = [
     document: "CNPJ 12.345.678/0001-90",
     email: "operacao@transalfa.com.br",
     phone: "(11) 4002-1100",
-    city: "Sao Paulo/SP",
+    city: "São Paulo/SP",
     status: "active",
     profile: "Transportadora",
     joinedAt: "04/02/2026",
@@ -101,12 +101,12 @@ const initialUsers: ManagedUser[] = [
     profile: "Embarcador",
     joinedAt: "17/06/2026",
     lastAccess: "Ontem, 15:44",
-    notes: "Cadastro aguardando conferencia comercial.",
+    notes: "Cadastro aguardando conferência comercial.",
   },
   {
     id: "EMP-3103",
     kind: "company",
-    name: "ViaSul Logistica",
+    name: "ViaSul Logística",
     document: "CNPJ 98.765.432/0001-00",
     email: "admin@viasul.com.br",
     phone: "(11) 3555-9090",
@@ -115,7 +115,7 @@ const initialUsers: ManagedUser[] = [
     profile: "Transportadora",
     joinedAt: "09/01/2026",
     lastAccess: "18/06/2026, 17:02",
-    notes: "Opera no corredor Sao Paulo -> Curitiba.",
+    notes: "Opera no corredor São Paulo -> Curitiba.",
   },
 ];
 
@@ -196,9 +196,9 @@ export function UserManagement() {
   return (
     <div>
       <PageHero
-        eyebrow="Gestao de Usuarios"
+        eyebrow="Gestão de Usuários"
         title="Administre motoristas e empresas cadastradas"
-        description="Consulte perfis, acompanhe status cadastral e controle acessos de usuarios da operacao."
+        description="Consulte perfis, acompanhe status cadastral e controle acessos de usuários da operação."
       />
 
       <section className="py-12 lg:py-16 bg-gray-50">
@@ -226,7 +226,7 @@ export function UserManagement() {
               <div className="p-5 border-b border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <Users className="w-6 h-6 text-orange-600" />
-                  <h2 className="text-xl font-bold text-gray-900">Usuarios cadastrados</h2>
+                  <h2 className="text-xl font-bold text-gray-900">Usuários cadastrados</h2>
                 </div>
                 <div className="relative mb-4">
                   <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -308,8 +308,8 @@ export function UserManagement() {
                         ["E-mail", selectedUser.email],
                         ["Telefone", selectedUser.phone],
                         ["Cidade", selectedUser.city],
-                        ["Ultimo acesso", selectedUser.lastAccess],
-                        ["Tipo de usuario", kindLabels[selectedUser.kind]],
+                        ["Último acesso", selectedUser.lastAccess],
+                        ["Tipo de usuário", kindLabels[selectedUser.kind]],
                       ].map(([label, value]) => (
                         <div key={label} className="bg-gray-50 rounded-xl p-4">
                           <div className="text-xs font-bold text-gray-500 mb-1">{label}</div>
@@ -333,7 +333,7 @@ export function UserManagement() {
                           />
                         </label>
                         <label className="block">
-                          <span className="block text-sm font-bold text-gray-700 mb-2">Observacoes administrativas</span>
+                          <span className="block text-sm font-bold text-gray-700 mb-2">Observações administrativas</span>
                           <textarea
                             rows={5}
                             value={draftNotes}
@@ -365,7 +365,7 @@ export function UserManagement() {
                     <div className="grid gap-3">
                       <button
                         type="button"
-                        onClick={() => updateSelectedUser({ status: "active" }, "Usuario ativado com sucesso.")}
+                        onClick={() => updateSelectedUser({ status: "active" }, "Usuário ativado com sucesso.")}
                         className="bg-green-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                       >
                         <BadgeCheck className="w-5 h-5" />
@@ -373,7 +373,7 @@ export function UserManagement() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => updateSelectedUser({ status: "pending" }, "Usuario marcado como pendente.")}
+                        onClick={() => updateSelectedUser({ status: "pending" }, "Usuário marcado como pendente.")}
                         className="bg-amber-500 text-white px-4 py-3 rounded-lg font-bold hover:bg-amber-600 transition-colors flex items-center justify-center gap-2"
                       >
                         <Clock className="w-5 h-5" />
@@ -381,7 +381,7 @@ export function UserManagement() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => updateSelectedUser({ status: "suspended" }, "Usuario suspenso.")}
+                        onClick={() => updateSelectedUser({ status: "suspended" }, "Usuário suspenso.")}
                         className="bg-red-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
                       >
                         <XCircle className="w-5 h-5" />
@@ -390,7 +390,7 @@ export function UserManagement() {
                     </div>
 
                     <div className="bg-white border-2 border-gray-100 rounded-xl p-5">
-                      <h3 className="font-bold text-gray-900 mb-3">Permissoes</h3>
+                      <h3 className="font-bold text-gray-900 mb-3">Permissões</h3>
                       <div className="space-y-3 text-sm text-gray-700">
                         <div className="flex items-center justify-between gap-3">
                           <span>Publicar cargas</span>

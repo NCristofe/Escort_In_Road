@@ -1,51 +1,51 @@
 import { Link } from "react-router";
-import { Truck, Clock, Shield, MapPin, ArrowRight, CheckCircle, Package, Star, TrendingUp, Users } from "lucide-react";
+import { Truck, Shield, MapPin, ArrowRight, CheckCircle, Package, Leaf, BadgeDollarSign } from "lucide-react";
 import { SafeImage } from "../components/media/SafeImage";
 
 export function Home() {
   const features = [
     {
-      icon: Clock,
-      title: "Agilidade nas Entregas",
-      description: "Prazos garantidos e cumpridos com pontualidade em todas as rotas do Brasil.",
+      icon: BadgeDollarSign,
+      title: "Frete Mais Barato",
+      description: "O caminhão já faria a viagem de volta. Por isso o frete de retorno custa menos que um frete dedicado.",
     },
     {
       icon: Shield,
-      title: "Segurança Garantida",
-      description: "Rastreamento 24h, seguros completos e equipe especializada.",
+      title: "Pagamento Protegido",
+      description: "O valor fica retido e só é repassado à transportadora depois da entrega confirmada.",
     },
     {
-      icon: TrendingUp,
-      title: "Tecnologia Avançada",
-      description: "Plataforma digital para gestão completa de suas cargas.",
+      icon: MapPin,
+      title: "Rastreamento e Canhoto",
+      description: "Acompanhe a viagem por GPS e receba a foto do canhoto assinado na entrega.",
     },
     {
-      icon: Users,
-      title: "Atendimento Personalizado",
-      description: "Equipe dedicada para atender suas necessidades específicas.",
+      icon: Leaf,
+      title: "Menos Caminhão Vazio",
+      description: "Cada retorno ocupado evita quilômetros rodados sem carga e emissões de CO₂.",
     },
   ];
 
   const services = [
     {
-      slug: "carga-fracionada",
-      title: "Carga Fracionada",
-      description: "Entregas rápidas de pequenos e médios volumes com segurança e eficiência",
+      slug: "frete-de-retorno",
+      title: "Frete de Retorno",
+      description: "Para quem não tem frota: sua carga no caminhão que voltaria vazio pela sua rota.",
       icon: Package,
       color: "bg-blue-500",
     },
     {
-      slug: "carga-completa",
-      title: "Carga Completa (FTL)",
-      description: "Dedicação exclusiva para grandes volumes com rotas otimizadas",
+      slug: "ocupacao-de-frota",
+      title: "Ocupação de Frota",
+      description: "Para transportadoras: receita extra no trecho em que o caminhão voltaria vazio.",
       icon: Truck,
       color: "bg-orange-500",
     },
     {
-      slug: "armazenagem",
-      title: "Armazenagem",
-      description: "Centros de distribuição estratégicos com gestão inteligente de estoque",
-      icon: MapPin,
+      slug: "pagamento-protegido",
+      title: "Pagamento Protegido",
+      description: "Valor retido até a entrega confirmada e repassado à transportadora: 85% ECF, 15% Escort.",
+      icon: Shield,
       color: "bg-green-500",
     },
   ];
@@ -57,24 +57,19 @@ export function Home() {
     { value: "ESG", label: "Painel de Emissões" },
   ];
 
-  const testimonials = [
+  // How a return freight happens, in the order the platform runs it.
+  const steps = [
     {
-      name: "Maria Silva",
-      company: "Indústria XYZ",
-      text: "Parceria de anos! A ESCORTinRoad sempre cumpre os prazos e tem um excelente custo-benefício.",
-      rating: 5,
+      title: "A transportadora informa o retorno",
+      text: "A empresa com frota (ECF) cadastra o caminhão, a data em que ele fica livre e a rota que fará na volta.",
     },
     {
-      name: "João Santos",
-      company: "Comércio ABC",
-      text: "Profissionalismo e comprometimento em todas as entregas. Recomendo!",
-      rating: 5,
+      title: "Quem contrata pede o frete",
+      text: "A empresa sem frota (ESF) informa origem, destino, datas e o desvio máximo aceito. A plataforma sugere os retornos compatíveis.",
     },
     {
-      name: "Ana Costa",
-      company: "E-commerce Tech",
-      text: "Sistema de rastreamento impecável. Sempre sabemos onde está nossa carga.",
-      rating: 5,
+      title: "Entrega confirmada, pagamento liberado",
+      text: "O motorista envia a foto do canhoto pelo aplicativo. Com a entrega confirmada, a Escort repassa o valor à transportadora.",
     },
   ];
 
@@ -90,13 +85,13 @@ export function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="inline-block bg-orange-600 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4">
-                #1 EM TRANSPORTE RODOVIÁRIO
+                FRETE DE RETORNO
               </div>
               <h1 className="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
-                Logística que <span className="text-orange-500">Move o Brasil</span>
+                O caminhão volta. <span className="text-orange-500">Sua carga vai junto.</span>
               </h1>
               <p className="text-xl mb-8 text-gray-300">
-                A ESCORTinRoad oferece soluções completas em transporte rodoviário com tecnologia, segurança e eficiência para sua empresa crescer.
+                A ESCORTinRoad conecta empresas que precisam transportar cargas a caminhões de transportadoras que fariam a viagem de volta vazios. Frete mais barato para quem contrata, receita extra para quem tem frota.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
@@ -118,11 +113,11 @@ export function Home() {
               <div className="mt-8 flex items-center gap-6 text-sm">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>Atendimento 24h</span>
+                  <span>Pagamento retido até a entrega</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span>Cobertura Nacional</span>
+                  <span>Rastreamento por GPS</span>
                 </div>
               </div>
             </div>
@@ -163,7 +158,7 @@ export function Home() {
               Por que Escolher a ESCORTinRoad?
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Somos referência em transporte rodoviário com diferenciais que fazem a diferença
+              Uma plataforma feita para o retorno ocioso, não para o frete comum
             </p>
           </div>
 
@@ -192,7 +187,7 @@ export function Home() {
               Nossos Serviços
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Soluções completas e personalizadas para cada tipo de necessidade
+              Para quem contrata o frete e para quem tem o caminhão
             </p>
           </div>
 
@@ -235,29 +230,24 @@ export function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-              O que Nossos Clientes Dizem
+              Como Funciona
             </h2>
             <p className="text-xl text-gray-600">
-              Confiança conquistada através de resultados
+              Três passos, da rota de retorno ao pagamento
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
+            {steps.map((step, index) => (
               <div
-                key={index}
+                key={step.title}
                 className="bg-gray-50 p-8 rounded-2xl shadow-md"
               >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-orange-500 text-orange-500" />
-                  ))}
+                <div className="bg-orange-600 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold mb-4">
+                  {index + 1}
                 </div>
-                <p className="text-gray-700 mb-6 italic">"{testimonial.text}"</p>
-                <div>
-                  <div className="font-bold text-gray-900">{testimonial.name}</div>
-                  <div className="text-sm text-gray-600">{testimonial.company}</div>
-                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
+                <p className="text-gray-700">{step.text}</p>
               </div>
             ))}
           </div>
@@ -271,7 +261,7 @@ export function Home() {
             Pronto para Começar?
           </h2>
           <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
-            Faça uma cotação gratuita e descubra como podemos otimizar sua logística
+            Faça uma cotação gratuita e veja se há um caminhão voltando pela sua rota
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link

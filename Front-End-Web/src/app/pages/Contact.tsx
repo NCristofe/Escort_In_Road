@@ -219,13 +219,11 @@ export function Contact() {
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-600 focus:border-transparent"
                   >
                     <option value="">Selecione o serviço</option>
-                    <option value="carga-fracionada">Carga Fracionada (LTL)</option>
-                    <option value="carga-completa">Carga Completa (FTL)</option>
-                    <option value="armazenagem">Armazenagem e Distribuição</option>
-                    <option value="entrega-expressa">Entrega Expressa</option>
-                    <option value="carga-especial">Cargas Especiais</option>
-                    <option value="ecommerce">E-commerce</option>
-                    <option value="consultoria">Consultoria Logística</option>
+                    <option value="frete-de-retorno">Contratar frete de retorno</option>
+                    <option value="ocupacao-de-frota">Ocupar o retorno da minha frota</option>
+                    <option value="pagamento-protegido">Pagamento protegido</option>
+                    <option value="indicadores-esg">Indicadores ESG</option>
+                    <option value="outro">Outro assunto</option>
                   </select>
                 </div>
 
